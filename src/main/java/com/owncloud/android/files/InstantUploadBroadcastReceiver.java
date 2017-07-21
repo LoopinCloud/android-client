@@ -56,13 +56,6 @@ public class InstantUploadBroadcastReceiver extends BroadcastReceiver {
     // http://developer.android.com/reference/android/hardware/Camera.html#ACTION_NEW_VIDEO
     private static final String NEW_VIDEO_ACTION = "android.hardware.action.NEW_VIDEO";
 
-    /**
-     * Because we support NEW_PHOTO_ACTION and NEW_PHOTO_ACTION_UNOFFICIAL it can happen that
-     * handleNewPictureAction is called twice for the same photo. Use this simple static variable to
-     * remember last uploaded photo to filter duplicates. Must not be null!
-     */
-    static String lastUploadedPhotoPath = "";
-
     @Override
     public void onReceive(Context context, Intent intent) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
@@ -81,6 +74,13 @@ public class InstantUploadBroadcastReceiver extends BroadcastReceiver {
             }
         }
     }
+
+    /**
+     * Because we support NEW_PHOTO_ACTION and NEW_PHOTO_ACTION_UNOFFICIAL it can happen that
+     * handleNewPictureAction is called twice for the same photo. Use this simple static variable to
+     * remember last uploaded photo to filter duplicates. Must not be null!
+     */
+    static String lastUploadedPhotoPath = "";
 
     private void handleNewPictureAction(Context context, Intent intent) {
         Cursor c = null;
@@ -105,14 +105,12 @@ public class InstantUploadBroadcastReceiver extends BroadcastReceiver {
         String[] CONTENT_PROJECTION = {
                 Images.Media.DATA, Images.Media.DISPLAY_NAME, Images.Media.MIME_TYPE, Images.Media.SIZE};
 
-        // if < Jelly Bean permission must be accepted during installation
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
-            int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE);
+        int permissionCheck = ContextCompat.checkSelfPermission(context,
+                Manifest.permission.READ_EXTERNAL_STORAGE);
 
-            if (android.content.pm.PackageManager.PERMISSION_GRANTED != permissionCheck) {
-                Log_OC.w(TAG, "Read external storage permission isn't granted, aborting");
-                return;
-            }
+        if (android.content.pm.PackageManager.PERMISSION_GRANTED != permissionCheck) {
+            Log_OC.w(TAG, "Read external storage permission isn't granted, aborting");
+            return;
         }
 
         c = context.getContentResolver().query(intent.getData(), CONTENT_PROJECTION, null, null, null);

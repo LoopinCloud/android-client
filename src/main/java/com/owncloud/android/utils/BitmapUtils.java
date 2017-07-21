@@ -56,8 +56,12 @@ public class BitmapUtils {
         final Options options = new Options();
         options.inScaled = true;
         options.inPurgeable = true;
-        options.inPreferQualityOverSpeed = false;
-        options.inMutable = false;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.GINGERBREAD_MR1) {
+            options.inPreferQualityOverSpeed = false;
+        }
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
+            options.inMutable = false;
+        }
 
         // make a false load of the bitmap to get its dimensions
         options.inJustDecodeBounds = true;

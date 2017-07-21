@@ -35,7 +35,7 @@
         android:layout_toLeftOf="@+id/buttonBar"
         android:ellipsize="middle"
         android:gravity="start|center_vertical"
-        android:text="@string/placeholder_filename"
+        android:text="Header Text"
         android:textColor="?android:textColorPrimary"
         android:textStyle="bold"/>
 
@@ -51,10 +51,7 @@
             android:layout_height="wrap_content"
             android:background="@color/transparent"
             android:clickable="true"
-            android:paddingTop="@dimen/standard_half_padding"
-            android:paddingBottom="@dimen/standard_half_padding"
-            android:paddingLeft="@dimen/standard_half_padding"
-            android:paddingRight="@dimen/standard_padding"
+            android:padding="@dimen/standard_half_padding"
             android:src="@drawable/ic_cloud_sync_off"/>
 
         <ImageButton
@@ -64,7 +61,7 @@
             android:background="@color/transparent"
             android:clickable="true"
             android:paddingBottom="@dimen/standard_half_padding"
-            android:paddingLeft="0dp"
+            android:paddingLeft="@dimen/standard_half_padding"
             android:paddingRight="@dimen/standard_padding"
             android:paddingTop="@dimen/standard_half_padding"
             android:src="@drawable/ic_dots_vertical"/>

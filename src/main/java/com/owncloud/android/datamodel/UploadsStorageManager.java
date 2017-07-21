@@ -605,12 +605,4 @@ public class UploadsStorageManager extends Observable {
         return result;
     }
 
-    public int removeAccountUploads(Account account) {
-        Log_OC.v(TAG, "Delete all uploads for account " + account.name);
-        return getDB().delete(
-                ProviderTableMeta.CONTENT_URI_UPLOADS,
-                ProviderTableMeta.UPLOADS_ACCOUNT_NAME + "=?",
-                new String[]{account.name});
-    }
-
 }

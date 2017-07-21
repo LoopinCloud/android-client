@@ -26,7 +26,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     /**
      * ownCloud {@link Account} where the main {@link OCFile} handled by the activity is located.
      */
-    private Account mCurrentAccount;
+    public Account mCurrentAccount;
 
     /**
      * Capabilities of the server where {@link #mCurrentAccount} lives.

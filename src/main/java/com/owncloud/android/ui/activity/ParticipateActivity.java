@@ -22,10 +22,8 @@
 package com.owncloud.android.ui.activity;
 
 import android.content.Intent;
-import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.widget.AppCompatButton;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.MenuItem;
@@ -34,7 +32,6 @@ import android.widget.TextView;
 
 import com.owncloud.android.R;
 import com.owncloud.android.utils.AnalyticsUtils;
-import com.owncloud.android.utils.ThemeUtils;
 
 /**
  * Activity providing information about ways to participate in the app's development.
@@ -55,11 +52,7 @@ public class ParticipateActivity extends FileActivity {
 
         // setup drawer
         setupDrawer(R.id.nav_participate);
-
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(ThemeUtils.getColoredTitle(getString(R.string.drawer_participate),
-                    ThemeUtils.fontColor()));
-        }
+        getSupportActionBar().setTitle(getString(R.string.drawer_participate));
 
         setupContent();
     }
@@ -78,34 +71,27 @@ public class ParticipateActivity extends FileActivity {
         contributeIrcView.setMovementMethod(LinkMovementMethod.getInstance());
         contributeIrcView.setText(Html.fromHtml(
                 getString(R.string.participate_contribute_irc_text,
-                        ThemeUtils.colorToHexString(ThemeUtils.primaryColor()),
-                        getString(R.string.irc_weblink))));
+                        getString(R.string.irc_weblink)
+                )));
 
         TextView contributeForumView = (TextView) findViewById(R.id.participate_contribute_forum_text);
         contributeForumView.setMovementMethod(LinkMovementMethod.getInstance());
         contributeForumView.setText(Html.fromHtml(
                 getString(R.string.participate_contribute_forum_text,
-                        ThemeUtils.colorToHexString(ThemeUtils.primaryColor()),
-                        getString(R.string.help_link))));
+                        getString(R.string.help_link)
+                )));
 
         TextView contributeTranslationView = (TextView) findViewById(R.id.participate_contribute_translate_text);
         contributeTranslationView.setMovementMethod(LinkMovementMethod.getInstance());
         contributeTranslationView.setText(Html.fromHtml(
-                getString(R.string.participate_contribute_translate_text,
-                        ThemeUtils.colorToHexString(ThemeUtils.primaryColor()),
-                        getString(R.string.translation_link))));
+                getString(R.string.participate_contribute_translate_text, getString(R.string.translation_link))));
 
         TextView contributeGithubView = (TextView) findViewById(R.id.participate_contribute_github_text);
         contributeGithubView.setMovementMethod(LinkMovementMethod.getInstance());
-        contributeGithubView.setText(Html.fromHtml(
-                getString(R.string.participate_contribute_github_text,
-                        ThemeUtils.colorToHexString(ThemeUtils.primaryColor()),
+        contributeGithubView.setText(Html.fromHtml(getString(R.string.participate_contribute_github_text,
                 getString(R.string.contributing_link))));
 
-        AppCompatButton reportButton = (AppCompatButton) findViewById(R.id.participate_testing_report);
-        reportButton.getBackground().setColorFilter(ThemeUtils.primaryColor(), PorterDuff.Mode.SRC_ATOP);
-        reportButton.setTextColor(ThemeUtils.fontColor());
-        reportButton.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.participate_testing_report).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.report_issue_link))));
@@ -131,7 +117,7 @@ public class ParticipateActivity extends FileActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        boolean retval = true;
+        boolean retval;
         switch (item.getItemId()) {
             case android.R.id.home: {
                 if (isDrawerOpen()) {
@@ -139,12 +125,10 @@ public class ParticipateActivity extends FileActivity {
                 } else {
                     openDrawer();
                 }
-                break;
             }
 
             default:
                 retval = super.onOptionsItemSelected(item);
-                break;
         }
         return retval;
     }

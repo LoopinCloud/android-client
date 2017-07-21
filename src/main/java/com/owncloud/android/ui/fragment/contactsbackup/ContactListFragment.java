@@ -1,4 +1,4 @@
-/*
+/**
  * Nextcloud Android client application
  *
  * @author Tobias Kaminsky
@@ -23,24 +23,18 @@ package com.owncloud.android.ui.fragment.contactsbackup;
 
 import android.Manifest;
 import android.accounts.Account;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.PorterDuff;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -55,15 +49,10 @@ import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.evernote.android.job.JobRequest;
 import com.evernote.android.job.util.support.PersistableBundleCompat;
 import com.owncloud.android.R;
-import com.owncloud.android.datamodel.FileDataStorageManager;
 import com.owncloud.android.datamodel.OCFile;
 import com.owncloud.android.files.services.FileDownloader;
 import com.owncloud.android.lib.common.utils.Log_OC;
@@ -74,7 +63,6 @@ import com.owncloud.android.ui.events.VCardToggleEvent;
 import com.owncloud.android.ui.fragment.FileFragment;
 import com.owncloud.android.utils.BitmapUtils;
 import com.owncloud.android.utils.PermissionUtil;
-import com.owncloud.android.utils.ThemeUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -93,8 +81,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ezvcard.Ezvcard;
 import ezvcard.VCard;
-
-import static com.owncloud.android.ui.fragment.contactsbackup.ContactListFragment.getDisplayName;
+import ezvcard.property.StructuredName;
 
 /**
  * This fragment shows all contacts from a file and allows to import them.
@@ -116,26 +103,7 @@ public class ContactListFragment extends FileFragment {
     @BindView(R.id.contactlist_restore_selected)
     public Button restoreContacts;
 
-    @BindView(R.id.empty_list_view_text)
-    public TextView emptyContentMessage;
-
-    @BindView(R.id.empty_list_view_headline)
-    public TextView emptyContentHeadline;
-
-    @BindView(R.id.empty_list_icon)
-    public ImageView emptyContentIcon;
-
-    @BindView(R.id.empty_list_progress)
-    public ProgressBar emptyContentProgressBar;
-
-    @BindView(R.id.empty_list_container)
-    public RelativeLayout emptyListContainer;
-
-
     private ContactListAdapter contactListAdapter;
-    private Account account;
-    private ArrayList<VCard> vCards = new ArrayList<>();
-    private OCFile ocFile;
 
     public static ContactListFragment newInstance(OCFile file, Account account) {
         ContactListFragment frag = new ContactListFragment();
@@ -159,19 +127,60 @@ public class ContactListFragment extends FileFragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.contactlist_fragment, container, false);
+        View view = inflater.inflate(R.layout.contactlist_fragment, null);
         ButterKnife.bind(this, view);
 
         setHasOptionsMenu(true);
 
         ContactsPreferenceActivity contactsPreferenceActivity = (ContactsPreferenceActivity) getActivity();
-
-        ActionBar actionBar = contactsPreferenceActivity.getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setTitle(R.string.actionbar_contacts_restore);
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
+        contactsPreferenceActivity.getSupportActionBar().setTitle(R.string.actionbar_contacts_restore);
+        contactsPreferenceActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         contactsPreferenceActivity.setDrawerIndicatorEnabled(false);
+
+        ArrayList<VCard> vCards = new ArrayList<>();
+
+        try {
+            OCFile ocFile = getArguments().getParcelable(FILE_NAME);
+            setFile(ocFile);
+            Account account = getArguments().getParcelable(ACCOUNT);
+
+            if (!ocFile.isDown()) {
+                Intent i = new Intent(getContext(), FileDownloader.class);
+                i.putExtra(FileDownloader.EXTRA_ACCOUNT, account);
+                i.putExtra(FileDownloader.EXTRA_FILE, ocFile);
+                getContext().startService(i);
+            } else {
+                File file = new File(ocFile.getStoragePath());
+                vCards.addAll(Ezvcard.parse(file).all());
+                Collections.sort(vCards, new Comparator<VCard>() {
+                    @Override
+                    public int compare(VCard o1, VCard o2) {
+                        if (o1.getFormattedName() != null && o2.getFormattedName() != null) {
+                            return o1.getFormattedName().getValue().compareTo(o2.getFormattedName().getValue());
+                        } else {
+                            if (o1.getFormattedName() == null) {
+                                return 1; // Send the contact to the end of the list
+                            } else {
+                                return -1;
+                            }
+
+                        }
+                    }
+                });
+            }
+        } catch (IOException e) {
+            Log_OC.e(TAG, "Error processing contacts file!", e);
+        }
+
+        restoreContacts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (checkAndAskForContactsWritePermission()) {
+                    getAccountForImport();
+                }
+            }
+        });
 
         recyclerView = (RecyclerView) view.findViewById(R.id.contactlist_recyclerview);
 
@@ -190,37 +199,6 @@ public class ContactListFragment extends FileFragment {
         }
         recyclerView.setAdapter(contactListAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        ocFile = getArguments().getParcelable(FILE_NAME);
-        setFile(ocFile);
-        account = getArguments().getParcelable(ACCOUNT);
-
-        if (!ocFile.isDown()) {
-            Intent i = new Intent(getContext(), FileDownloader.class);
-            i.putExtra(FileDownloader.EXTRA_ACCOUNT, account);
-            i.putExtra(FileDownloader.EXTRA_FILE, ocFile);
-            getContext().startService(i);
-
-            // Listen for download messages
-            IntentFilter downloadIntentFilter = new IntentFilter(FileDownloader.getDownloadAddedMessage());
-            downloadIntentFilter.addAction(FileDownloader.getDownloadFinishMessage());
-            DownloadFinishReceiver mDownloadFinishReceiver = new DownloadFinishReceiver();
-            getContext().registerReceiver(mDownloadFinishReceiver, downloadIntentFilter);
-        } else {
-            loadContactsTask.execute();
-        }
-
-        restoreContacts.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if (checkAndAskForContactsWritePermission()) {
-                    getAccountForImport();
-                }
-            }
-        });
-
-        restoreContacts.setTextColor(ThemeUtils.primaryAccentColor());
 
         return view;
     }
@@ -262,9 +240,6 @@ public class ContactListFragment extends FileFragment {
     @Override
     public void onStop() {
         EventBus.getDefault().unregister(this);
-        if (loadContactsTask != null) {
-            loadContactsTask.cancel(true);
-        }
         super.onStop();
     }
 
@@ -291,14 +266,6 @@ public class ContactListFragment extends FileFragment {
         return retval;
     }
 
-    private void setLoadingMessage() {
-        emptyContentHeadline.setText(R.string.file_list_loading);
-        emptyContentMessage.setText("");
-
-        emptyContentIcon.setVisibility(View.GONE);
-        emptyContentProgressBar.setVisibility(View.VISIBLE);
-    }
-
     private void setSelectAllMenuItem(MenuItem selectAll, boolean checked) {
         selectAll.setChecked(checked);
         if (checked) {
@@ -317,7 +284,6 @@ public class ContactListFragment extends FileFragment {
 
             badge = (ImageView) itemView.findViewById(R.id.contactlist_item_icon);
             name = (CheckedTextView) itemView.findViewById(R.id.contactlist_item_name);
-
 
             itemView.setTag(this);
         }
@@ -446,12 +412,7 @@ public class ContactListFragment extends FileFragment {
                     if (grantResults[index] >= 0) {
                         getAccountForImport();
                     } else {
-                        if (getView() != null) {
-                            Snackbar.make(getView(), R.string.contactlist_no_permission, Snackbar.LENGTH_LONG)
-                                    .show();
-                        } else {
-                            Toast.makeText(getContext(), R.string.contactlist_no_permission, Toast.LENGTH_LONG).show();
-                        }
+                        Snackbar.make(getView(), R.string.contactlist_no_permission, Snackbar.LENGTH_LONG).show();
                     }
                     break;
                 }
@@ -485,77 +446,6 @@ public class ContactListFragment extends FileFragment {
             return displayName;
         }
     }
-
-    private class DownloadFinishReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equalsIgnoreCase(FileDownloader.getDownloadFinishMessage())) {
-                String downloadedRemotePath = intent.getStringExtra(FileDownloader.EXTRA_REMOTE_PATH);
-
-                FileDataStorageManager storageManager = new FileDataStorageManager(account,
-                        getContext().getContentResolver());
-                ocFile = storageManager.getFileByPath(downloadedRemotePath);
-                loadContactsTask.execute();
-            }
-        }
-    }
-
-    public static class VCardComparator implements Comparator<VCard> {
-        @Override
-        public int compare(VCard o1, VCard o2) {
-            String contac1 = getDisplayName(o1);
-            String contac2 = getDisplayName(o2);
-
-            return contac1.compareToIgnoreCase(contac2);
-        }
-
-
-    }
-
-    private AsyncTask loadContactsTask = new AsyncTask() {
-
-        @Override
-        protected void onPreExecute() {
-            setLoadingMessage();
-        }
-
-        @Override
-        protected Object doInBackground(Object[] params) {
-            if (!isCancelled()) {
-                File file = new File(ocFile.getStoragePath());
-                try {
-                    vCards.addAll(Ezvcard.parse(file).all());
-                    Collections.sort(vCards, new VCardComparator());
-                } catch (IOException e) {
-                    Log_OC.e(TAG, "IO Exception: " + file.getAbsolutePath());
-                    return false;
-                }
-                return true;
-            }
-            return false;
-        }
-
-        @Override
-        protected void onPostExecute(Object o) {
-            if (!isCancelled()) {
-                emptyListContainer.setVisibility(View.GONE);
-                contactListAdapter.replaceVCards(vCards);
-            }
-        }
-    };
-
-    public static String getDisplayName(VCard vCard) {
-        if (vCard.getFormattedName() != null) {
-            return vCard.getFormattedName().getValue();
-        } else if (vCard.getTelephoneNumbers() != null && vCard.getTelephoneNumbers().size() > 0) {
-            return vCard.getTelephoneNumbers().get(0).getText();
-        } else if (vCard.getEmails() != null && vCard.getEmails().size() > 0) {
-            return vCard.getEmails().get(0).getValue();
-        }
-
-        return "";
-    }
 }
 
 class ContactListAdapter extends RecyclerView.Adapter<ContactListFragment.ContactItemViewHolder> {
@@ -585,11 +475,6 @@ class ContactListAdapter extends RecyclerView.Adapter<ContactListFragment.Contac
         }
     }
 
-    public void replaceVCards(List<VCard> vCards) {
-        this.vCards = vCards;
-        notifyDataSetChanged();
-    }
-
     public int[] getCheckedIntArray() {
         int[] intArray;
         if (checkedVCards != null && checkedVCards.size() > 0) {
@@ -615,27 +500,24 @@ class ContactListAdapter extends RecyclerView.Adapter<ContactListFragment.Contac
 
     @Override
     public void onBindViewHolder(final ContactListFragment.ContactItemViewHolder holder, final int position) {
-        final int verifiedPosition = holder.getAdapterPosition();
-        final VCard vcard = vCards.get(verifiedPosition);
+        final VCard vcard = vCards.get(position);
 
         if (vcard != null) {
 
             if (checkedVCards.contains(position)) {
                 holder.getName().setChecked(true);
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    holder.getName().getCheckMarkDrawable()
-                            .setColorFilter(ThemeUtils.primaryAccentColor(), PorterDuff.Mode.SRC_ATOP);
-                }
             } else {
                 holder.getName().setChecked(false);
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    holder.getName().getCheckMarkDrawable().clearColorFilter();
-                }
             }
-
-            holder.getName().setText(getDisplayName(vcard));
+            // name
+            StructuredName name = vcard.getStructuredName();
+            if (name != null) {
+                String first = (name.getGiven() == null) ? "" : name.getGiven() + " ";
+                String last = (name.getFamily() == null) ? "" : name.getFamily();
+                holder.getName().setText(first + last);
+            } else {
+                holder.getName().setText("");
+            }
 
             // photo
             if (vcard.getPhotos().size() > 0) {
@@ -666,24 +548,15 @@ class ContactListAdapter extends RecyclerView.Adapter<ContactListFragment.Contac
                     holder.getName().setChecked(!holder.getName().isChecked());
 
                     if (holder.getName().isChecked()) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                            holder.getName().getCheckMarkDrawable()
-                                    .setColorFilter(ThemeUtils.primaryAccentColor(), PorterDuff.Mode.SRC_ATOP);
-                        }
-
-                        if (!checkedVCards.contains(verifiedPosition)) {
-                            checkedVCards.add(verifiedPosition);
+                        if (!checkedVCards.contains(position)) {
+                            checkedVCards.add(position);
                         }
                         if (checkedVCards.size() == 1) {
                             EventBus.getDefault().post(new VCardToggleEvent(true));
                         }
                     } else {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                            holder.getName().getCheckMarkDrawable().clearColorFilter();
-                        }
-
-                        if (checkedVCards.contains(verifiedPosition)) {
-                            checkedVCards.remove(verifiedPosition);
+                        if (checkedVCards.contains(position)) {
+                            checkedVCards.remove(position);
                         }
 
                         if (checkedVCards.size() == 0) {
@@ -716,5 +589,4 @@ class ContactListAdapter extends RecyclerView.Adapter<ContactListFragment.Contac
 
         notifyDataSetChanged();
     }
-
 }

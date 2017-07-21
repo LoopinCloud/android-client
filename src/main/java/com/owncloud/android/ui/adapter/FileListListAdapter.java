@@ -1,4 +1,4 @@
-/*
+/**
  * ownCloud Android client application
  *
  * @author Bartek Przybylski
@@ -7,16 +7,16 @@
  * @author masensio
  * Copyright (C) 2011  Bartek Przybylski
  * Copyright (C) 2016 ownCloud Inc.
- *
+ * <p>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2,
  * as published by the Free Software Foundation.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -24,9 +24,7 @@ package com.owncloud.android.ui.adapter;
 
 
 import android.accounts.Account;
-import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Handler;
@@ -48,9 +46,7 @@ import com.owncloud.android.authentication.AccountUtils;
 import com.owncloud.android.datamodel.FileDataStorageManager;
 import com.owncloud.android.datamodel.OCFile;
 import com.owncloud.android.datamodel.ThumbnailsCacheManager;
-import com.owncloud.android.datamodel.VirtualFolderType;
 import com.owncloud.android.db.PreferenceManager;
-import com.owncloud.android.db.ProviderMeta;
 import com.owncloud.android.files.services.FileDownloader.FileDownloaderBinder;
 import com.owncloud.android.files.services.FileUploader.FileUploaderBinder;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
@@ -58,17 +54,13 @@ import com.owncloud.android.lib.common.utils.Log_OC;
 import com.owncloud.android.lib.resources.files.ReadRemoteFileOperation;
 import com.owncloud.android.lib.resources.files.RemoteFile;
 import com.owncloud.android.lib.resources.shares.OCShare;
-import com.owncloud.android.lib.resources.shares.ShareType;
 import com.owncloud.android.services.OperationsService.OperationsServiceBinder;
 import com.owncloud.android.ui.activity.ComponentsGetter;
-import com.owncloud.android.ui.activity.FileActivity;
-import com.owncloud.android.ui.activity.ShareActivity;
 import com.owncloud.android.ui.fragment.ExtendedListFragment;
 import com.owncloud.android.ui.interfaces.OCFileListFragmentInterface;
 import com.owncloud.android.utils.DisplayUtils;
 import com.owncloud.android.utils.FileStorageUtils;
 import com.owncloud.android.utils.MimeTypeUtil;
-import com.owncloud.android.utils.ThemeUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -81,7 +73,6 @@ import java.util.Vector;
  */
 public class FileListListAdapter extends BaseAdapter {
 
-    public static final int showFilenameColumnThreshold = 4;
     private Context mContext;
     private Vector<OCFile> mFilesAll = new Vector<OCFile>();
     private Vector<OCFile> mFiles = null;
@@ -95,8 +86,6 @@ public class FileListListAdapter extends BaseAdapter {
     private FilesFilter mFilesFilter;
     private OCFile currentDirectory;
     private static final String TAG = FileListListAdapter.class.getSimpleName();
-
-    private ArrayList<ThumbnailsCacheManager.ThumbnailGenerationTask> asyncTasks = new ArrayList<>();
 
     public FileListListAdapter(
             boolean justFolders,
@@ -195,7 +184,8 @@ public class FileListListAdapter extends BaseAdapter {
 
         View view = convertView;
         OCFile file = null;
-        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflator = (LayoutInflater) mContext
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         if (mFiles != null && mFiles.size() > position) {
             file = mFiles.get(position);
@@ -217,26 +207,23 @@ public class FileListListAdapter extends BaseAdapter {
         if (convertView == null || convertView.getTag() != viewType) {
             switch (viewType) {
                 case GRID_IMAGE:
-                    view = inflater.inflate(R.layout.grid_image, parent, false);
+                    view = inflator.inflate(R.layout.grid_image, parent, false);
                     view.setTag(ViewType.GRID_IMAGE);
                     break;
                 case GRID_ITEM:
-                    view = inflater.inflate(R.layout.grid_item, parent, false);
+                    view = inflator.inflate(R.layout.grid_item, parent, false);
                     view.setTag(ViewType.GRID_ITEM);
                     break;
                 case LIST_ITEM:
-                    view = inflater.inflate(R.layout.list_item, parent, false);
+                    view = inflator.inflate(R.layout.list_item, parent, false);
                     view.setTag(ViewType.LIST_ITEM);
                     break;
             }
         }
 
         if (file != null) {
+
             ImageView fileIcon = (ImageView) view.findViewById(R.id.thumbnail);
-            ImageView sharedIconV = (ImageView) view.findViewById(R.id.sharedIcon);
-            if (file.isSharedWithSharee() || file.isSharedWithMe()) {
-                sharedIconV.setImageResource(R.drawable.shared_via_users);
-            }
 
             fileIcon.setTag(file.getFileId());
             TextView fileName;
@@ -257,37 +244,22 @@ public class FileListListAdapter extends BaseAdapter {
                     fileSizeV.setVisibility(View.VISIBLE);
                     fileSizeV.setText(DisplayUtils.bytesToHumanReadable(file.getFileLength()));
 
-                    // Shared icon clickable
-                    if (file.isSharedViaLink() || file.isSharedWithSharee()) {
-                        final OCFile temp = file;
-                        sharedIconV.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                Intent intent = new Intent(mContext, ShareActivity.class);
-                                intent.putExtra(FileActivity.EXTRA_FILE, temp);
-                                intent.putExtra(FileActivity.EXTRA_ACCOUNT, mAccount);
-                                mContext.startActivity(intent);
-                            }
-                        });
-                    }
-
 
                 case GRID_ITEM:
                     // filename
                     fileName = (TextView) view.findViewById(R.id.Filename);
+                    name = file.getFileName();
                     fileName.setText(name);
-
-                    if (OCFileListFragmentInterface.getColumnSize() > showFilenameColumnThreshold
-                            && viewType == ViewType.GRID_ITEM) {
-                        fileName.setVisibility(View.GONE);
-                    }
 
                 case GRID_IMAGE:
                     // sharedIcon
+                    ImageView sharedIconV = (ImageView) view.findViewById(R.id.sharedIcon);
                     if (file.isSharedViaLink()) {
+                        sharedIconV.setImageResource(R.drawable.shared_via_link);
                         sharedIconV.setVisibility(View.VISIBLE);
                         sharedIconV.bringToFront();
                     } else if (file.isSharedWithSharee() || file.isSharedWithMe()) {
+                        sharedIconV.setImageResource(R.drawable.shared_via_users);
                         sharedIconV.setVisibility(View.VISIBLE);
                         sharedIconV.bringToFront();
                     } else {
@@ -297,29 +269,37 @@ public class FileListListAdapter extends BaseAdapter {
                     // local state
                     ImageView localStateView = (ImageView) view.findViewById(R.id.localFileIndicator);
                     localStateView.bringToFront();
-                    FileDownloaderBinder downloaderBinder = mTransferServiceGetter.getFileDownloaderBinder();
-                    FileUploaderBinder uploaderBinder = mTransferServiceGetter.getFileUploaderBinder();
-                    OperationsServiceBinder opsBinder = mTransferServiceGetter.getOperationsServiceBinder();
+                    FileDownloaderBinder downloaderBinder =
+                            mTransferServiceGetter.getFileDownloaderBinder();
+                    FileUploaderBinder uploaderBinder =
+                            mTransferServiceGetter.getFileUploaderBinder();
+                    OperationsServiceBinder opsBinder =
+                            mTransferServiceGetter.getOperationsServiceBinder();
 
                     localStateView.setVisibility(View.INVISIBLE);   // default first
 
-                    if (opsBinder != null && opsBinder.isSynchronizing(mAccount, file)) {
-                        //synchronizing
+                    if ( //synchronizing
+                            opsBinder != null &&
+                                    opsBinder.isSynchronizing(mAccount, file)
+                            ) {
                         localStateView.setImageResource(R.drawable.ic_synchronizing);
                         localStateView.setVisibility(View.VISIBLE);
 
-                    } else if (downloaderBinder != null && downloaderBinder.isDownloading(mAccount, file)) {
-                        // downloading
+                    } else if ( // downloading
+                            downloaderBinder != null &&
+                                    downloaderBinder.isDownloading(mAccount, file)
+                            ) {
                         localStateView.setImageResource(R.drawable.ic_synchronizing);
                         localStateView.setVisibility(View.VISIBLE);
 
-                    } else if (uploaderBinder != null && uploaderBinder.isUploading(mAccount, file)) {
-                        //uploading
+                    } else if ( //uploading
+                            uploaderBinder != null &&
+                                    uploaderBinder.isUploading(mAccount, file)
+                            ) {
                         localStateView.setImageResource(R.drawable.ic_synchronizing);
                         localStateView.setVisibility(View.VISIBLE);
 
-                    } else if (file.getEtagInConflict() != null) {
-                        // conflict
+                    } else if (file.getEtagInConflict() != null) {   // conflict
                         localStateView.setImageResource(R.drawable.ic_synchronizing_error);
                         localStateView.setVisibility(View.VISIBLE);
 
@@ -332,6 +312,7 @@ public class FileListListAdapter extends BaseAdapter {
             }
 
             // For all Views
+
             if (file.getIsFavorite()) {
                 view.findViewById(R.id.favorite_action).setVisibility(View.VISIBLE);
             } else {
@@ -343,15 +324,18 @@ public class FileListListAdapter extends BaseAdapter {
             view.setBackgroundColor(Color.WHITE);
 
             AbsListView parentList = (AbsListView) parent;
-
-            if (parentList.getChoiceMode() != AbsListView.CHOICE_MODE_NONE && parentList.getCheckedItemCount() > 0) {
+            if (parentList.getChoiceMode() != AbsListView.CHOICE_MODE_NONE &&
+                    parentList.getCheckedItemCount() > 0
+                    ) {
                 if (parentList.isItemChecked(position)) {
-                    view.setBackgroundColor(mContext.getResources().getColor(R.color.selected_item_background));
-                    checkBoxV.setImageDrawable(ThemeUtils.tintDrawable(R.drawable.ic_checkbox_marked,
-                            ThemeUtils.primaryColor()));
+                    view.setBackgroundColor(mContext.getResources().getColor(
+                            R.color.selected_item_background));
+                    checkBoxV.setImageResource(
+                            R.drawable.ic_checkbox_marked);
                 } else {
                     view.setBackgroundColor(Color.WHITE);
-                    checkBoxV.setImageResource(R.drawable.ic_checkbox_blank_outline);
+                    checkBoxV.setImageResource(
+                            R.drawable.ic_checkbox_blank_outline);
                 }
                 checkBoxV.setVisibility(View.VISIBLE);
             }
@@ -384,7 +368,8 @@ public class FileListListAdapter extends BaseAdapter {
                             try {
                                 final ThumbnailsCacheManager.ThumbnailGenerationTask task =
                                         new ThumbnailsCacheManager.ThumbnailGenerationTask(
-                                                fileIcon, mStorageManager, mAccount, asyncTasks);
+                                                fileIcon, mStorageManager, mAccount
+                                        );
 
                                 if (thumbnail == null) {
                                     if (MimeTypeUtil.isVideo(file)) {
@@ -400,7 +385,6 @@ public class FileListListAdapter extends BaseAdapter {
                                                 task
                                         );
                                 fileIcon.setImageDrawable(asyncDrawable);
-                                asyncTasks.add(task);
                                 task.execute(file);
                             } catch (IllegalArgumentException e) {
                                 Log_OC.d(TAG, "ThumbnailGenerationTask : " + e.getMessage());
@@ -409,19 +393,25 @@ public class FileListListAdapter extends BaseAdapter {
                     }
 
                     if (file.getMimetype().equalsIgnoreCase("image/png")) {
-                        fileIcon.setBackgroundColor(mContext.getResources().getColor(R.color.background_color));
+                        fileIcon.setBackgroundColor(mContext.getResources()
+                                .getColor(R.color.background_color));
                     }
 
 
                 } else {
-                    fileIcon.setImageResource(MimeTypeUtil.getFileTypeIconId(file.getMimetype(), file.getFileName()));
+                    fileIcon.setImageResource(MimeTypeUtil.getFileTypeIconId(file.getMimetype(),
+                            file.getFileName()));
                 }
 
 
             } else {
                 // Folder
-                fileIcon.setImageDrawable(MimeTypeUtil.getFolderTypeIcon(file.isSharedWithMe() ||
-                        file.isSharedWithSharee(), file.isSharedViaLink()));
+                fileIcon.setImageResource(
+                        MimeTypeUtil.getFolderTypeIconId(
+                                file.isSharedWithMe() || file.isSharedWithSharee(),
+                                file.isSharedViaLink()
+                        )
+                );
             }
         }
         return view;
@@ -488,18 +478,39 @@ public class FileListListAdapter extends BaseAdapter {
         }
     }
 
-    public void setData(ArrayList<Object> objects, ExtendedListFragment.SearchType searchType, FileDataStorageManager storageManager) {
-        if (storageManager != null && mStorageManager == null) {
-            mStorageManager = storageManager;
-        }
+    public void setData(ArrayList<Object> objects, ExtendedListFragment.SearchType searchType) {
         mFiles = new Vector<>();
+        if (searchType.equals(ExtendedListFragment.SearchType.SHARED_FILTER)) {
+            ArrayList<OCShare> shares = new ArrayList<>();
+            for (int i = 0; i < objects.size(); i++) {
+                // check type before cast as of long running data fetch it is possible that old result is filled
+                if (objects.get(i) instanceof OCShare) {
+                    OCShare ocShare = (OCShare) objects.get(i);
 
-        // early exit
-        if (objects.size() > 0 && mStorageManager != null) {
-            if (searchType.equals(ExtendedListFragment.SearchType.SHARED_FILTER)) {
-                parseShares(objects);
-            } else {
-                parseVirtuals(objects, searchType);
+                    shares.add(ocShare);
+
+                    // get ocFile from Server to have an up-to-date copy
+                    ReadRemoteFileOperation operation = new ReadRemoteFileOperation(ocShare.getPath());
+                    RemoteOperationResult result = operation.execute(mAccount, mContext);
+                    if (result.isSuccess()) {
+                        OCFile file = FileStorageUtils.fillOCFile((RemoteFile) result.getData().get(0));
+
+                        mStorageManager.saveFile(file);
+
+                        if (!mFiles.contains(file)) {
+                            mFiles.add(file);
+                        }
+                    } else {
+                        Log_OC.e(TAG, "Error in getting prop for file: " + ocShare.getPath());
+                    }
+                }
+            }
+            mStorageManager.saveShares(shares);
+        } else {
+            for (int i = 0; i < objects.size(); i++) {
+                OCFile ocFile = FileStorageUtils.fillOCFile((RemoteFile) objects.get(i));
+                searchForLocalFileInDefaultPath(ocFile);
+                mFiles.add(ocFile);
             }
         }
 
@@ -522,83 +533,6 @@ public class FileListListAdapter extends BaseAdapter {
                 OCFileListFragmentInterface.finishedFiltering();
             }
         });
-    }
-
-    private void parseShares(ArrayList<Object> objects) {
-        ArrayList<OCShare> shares = new ArrayList<>();
-        for (int i = 0; i < objects.size(); i++) {
-            // check type before cast as of long running data fetch it is possible that old result is filled
-            if (objects.get(i) instanceof OCShare) {
-                OCShare ocShare = (OCShare) objects.get(i);
-
-                shares.add(ocShare);
-
-                // get ocFile from Server to have an up-to-date copy
-                ReadRemoteFileOperation operation = new ReadRemoteFileOperation(ocShare.getPath());
-                RemoteOperationResult result = operation.execute(mAccount, mContext);
-                if (result.isSuccess()) {
-                    OCFile file = FileStorageUtils.fillOCFile((RemoteFile) result.getData().get(0));
-                    searchForLocalFileInDefaultPath(file);
-                    file = mStorageManager.saveFileWithParent(file, mContext);
-
-                    ShareType newShareType = ocShare.getShareType();
-                    if (newShareType == ShareType.PUBLIC_LINK) {
-                        file.setShareViaLink(true);
-                    } else if (newShareType == ShareType.USER || newShareType == ShareType.GROUP ||
-                                    newShareType == ShareType.EMAIL || newShareType == ShareType.FEDERATED) {
-                        file.setShareWithSharee(true);
-                    }
-
-                    mStorageManager.saveFile(file);
-
-                    if (!mFiles.contains(file)) {
-                        mFiles.add(file);
-                    }
-                } else {
-                    Log_OC.e(TAG, "Error in getting prop for file: " + ocShare.getPath());
-                }
-            }
-        }
-        mStorageManager.saveShares(shares);
-    }
-
-    private void parseVirtuals(ArrayList<Object> objects, ExtendedListFragment.SearchType searchType) {
-        VirtualFolderType type;
-        boolean onlyImages = false;
-        switch (searchType) {
-            case FAVORITE_SEARCH:
-                type = VirtualFolderType.FAVORITE;
-                break;
-            case PHOTO_SEARCH:
-                type = VirtualFolderType.PHOTOS;
-                onlyImages = true;
-                break;
-            default:
-                type = VirtualFolderType.NONE;
-                break;
-        }
-
-        mStorageManager.deleteVirtuals(type);
-
-        ArrayList<ContentValues> contentValues = new ArrayList<>();
-
-        for (int i = 0; i < objects.size(); i++) {
-            OCFile ocFile = FileStorageUtils.fillOCFile((RemoteFile) objects.get(i));
-            searchForLocalFileInDefaultPath(ocFile);
-            ocFile = mStorageManager.saveFileWithParent(ocFile, mContext);
-
-            if (!onlyImages || MimeTypeUtil.isImage(ocFile)) {
-                mFiles.add(ocFile);
-            }
-
-            ContentValues cv = new ContentValues();
-            cv.put(ProviderMeta.ProviderTableMeta.VIRTUAL_TYPE, type.toString());
-            cv.put(ProviderMeta.ProviderTableMeta.VIRTUAL_OCFILE_ID, ocFile.getFileId());
-
-            contentValues.add(cv);
-        }
-
-        mStorageManager.saveVirtuals(type, contentValues);
     }
 
     /**
@@ -714,20 +648,6 @@ public class FileListListAdapter extends BaseAdapter {
             }
         }
         return ret;
-    }
-
-    public void cancelAllPendingTasks() {
-        for (ThumbnailsCacheManager.ThumbnailGenerationTask task : asyncTasks) {
-            if (task != null) {
-                task.cancel(true);
-                if (task.getGetMethod() != null) {
-                    Log_OC.d(TAG, "cancel: abort get method directly");
-                    task.getGetMethod().abort();
-                }
-            }
-        }
-
-        asyncTasks.clear();
     }
 
 }

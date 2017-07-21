@@ -106,7 +106,6 @@ public class PreviewMediaFragment extends FileFragment implements
     private MediaServiceConnection mMediaServiceConnection = null;
     private VideoHelper mVideoHelper;
     private boolean mAutoplay;
-    private static boolean mOnResume = false;
     public boolean mPrepared;
 
     private static final String TAG = PreviewMediaFragment.class.getSimpleName();
@@ -221,7 +220,6 @@ public class PreviewMediaFragment extends FileFragment implements
      */
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        mOnResume = true;
         super.onActivityCreated(savedInstanceState);
         Log_OC.v(TAG, "onActivityCreated");
 
@@ -236,11 +234,14 @@ public class PreviewMediaFragment extends FileFragment implements
             if (!file.isDown()) {
                 throw new IllegalStateException("There is no local file to preview");
             }
-        } else {
-            file = savedInstanceState.getParcelable(PreviewMediaFragment.EXTRA_FILE);
+
+        }
+        else {
+            file = (OCFile) savedInstanceState.getParcelable(PreviewMediaFragment.EXTRA_FILE);
             setFile(file);
             mAccount = savedInstanceState.getParcelable(PreviewMediaFragment.EXTRA_ACCOUNT);
-            mSavedPlaybackPosition = savedInstanceState.getInt(PreviewMediaFragment.EXTRA_PLAY_POSITION);
+            mSavedPlaybackPosition =
+                    savedInstanceState.getInt(PreviewMediaFragment.EXTRA_PLAY_POSITION);
             mAutoplay = savedInstanceState.getBoolean(PreviewMediaFragment.EXTRA_PLAYING);
 
         }
@@ -250,12 +251,15 @@ public class PreviewMediaFragment extends FileFragment implements
                 mVideoPreview.setVisibility(View.VISIBLE);
                 mImagePreview.setVisibility(View.GONE);
                 prepareVideo();
-            } else {
+
+            }
+            else {
                 mVideoPreview.setVisibility(View.GONE);
                 mImagePreview.setVisibility(View.VISIBLE);
                 extractAndSetCoverArt(file);
             }
         }
+
     }
 
     /**
@@ -303,8 +307,11 @@ public class PreviewMediaFragment extends FileFragment implements
         }
         else {
             if (mMediaServiceBinder != null) {
-                outState.putInt(PreviewMediaFragment.EXTRA_PLAY_POSITION, mMediaServiceBinder.getCurrentPosition());
-                outState.putBoolean(PreviewMediaFragment.EXTRA_PLAYING, mMediaServiceBinder.isPlaying());
+                outState.putInt(
+                        PreviewMediaFragment.EXTRA_PLAY_POSITION,
+                        mMediaServiceBinder.getCurrentPosition());
+                outState.putBoolean(
+                        PreviewMediaFragment.EXTRA_PLAYING, mMediaServiceBinder.isPlaying());
             }
         }
     }
@@ -558,8 +565,6 @@ public class PreviewMediaFragment extends FileFragment implements
     @Override
     public void onResume() {
         super.onResume();
-        mOnResume = !mOnResume;
-
         if (getActivity() != null) {
             AnalyticsUtils.setCurrentScreenName(getActivity(), SCREEN_NAME, TAG);
         }
@@ -580,7 +585,6 @@ public class PreviewMediaFragment extends FileFragment implements
         if (mMediaServiceConnection != null) {
             Log_OC.d(TAG, "Unbinding from MediaService ...");
             if (mMediaServiceBinder != null && mMediaController != null) {
-                mMediaController.stopMediaPlayerMessages();
                 mMediaServiceBinder.unregisterMediaController(mMediaController);
             }
             getActivity().unbindService(mMediaServiceConnection);
@@ -634,7 +638,7 @@ public class PreviewMediaFragment extends FileFragment implements
 
     private void playAudio() {
         OCFile file = getFile();
-        if (!mMediaServiceBinder.isPlaying(file) && !mOnResume) {
+        if (!mMediaServiceBinder.isPlaying(file)) {
             Log_OC.d(TAG, "starting playback of " + file.getStoragePath());
             mMediaServiceBinder.start(mAccount, file, mAutoplay, mSavedPlaybackPosition);
 
@@ -645,8 +649,6 @@ public class PreviewMediaFragment extends FileFragment implements
                 mMediaController.updatePausePlay();
             }
         }
-
-        mOnResume = false;
     }
 
 

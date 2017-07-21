@@ -24,7 +24,6 @@ package com.owncloud.android.ui.fragment;
 import android.accounts.Account;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.v7.widget.AppCompatCheckBox;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -54,7 +53,6 @@ import com.owncloud.android.ui.dialog.RenameFileDialogFragment;
 import com.owncloud.android.utils.AnalyticsUtils;
 import com.owncloud.android.utils.DisplayUtils;
 import com.owncloud.android.utils.MimeTypeUtil;
-import com.owncloud.android.utils.ThemeUtils;
 
 import java.lang.ref.WeakReference;
 
@@ -145,12 +143,9 @@ public class FileDetailFragment extends FileFragment implements OnClickListener 
         if (mLayout == R.layout.file_details_fragment) {
             mView.findViewById(R.id.fdFavorite).setOnClickListener(this);
             ProgressBar progressBar = (ProgressBar)mView.findViewById(R.id.fdProgressBar);
-            ThemeUtils.colorPreLollipopHorizontalProgressBar(progressBar);
+            DisplayUtils.colorPreLollipopHorizontalProgressBar(progressBar);
             mProgressListener = new ProgressListener(progressBar);
             mView.findViewById(R.id.fdCancelBtn).setOnClickListener(this);
-
-            AppCompatCheckBox favoriteCheckBox = (AppCompatCheckBox) mView.findViewById(R.id.fdFavorite);
-            ThemeUtils.tintCheckbox(favoriteCheckBox, ThemeUtils.primaryAccentColor());
         }
 
         updateFileDetails(false, false);
@@ -339,7 +334,6 @@ public class FileDetailFragment extends FileFragment implements OnClickListener 
             }
             default:
                 Log_OC.e(TAG, "Incorrect view clicked!");
-                break;
         }
     }
 

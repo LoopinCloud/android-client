@@ -47,7 +47,7 @@
     <string name="prefs_fingerprint_notsetup">Er zijn geen vingerafdrukken ingesteld.</string>
     <string name="prefs_show_hidden_files">Verborgen bestanden weergeven</string>
     <string name="prefs_instant_upload">Directe upload van afbeeldingen</string>
-    <string name="prefs_instant_upload_summary">Direct afbeeldingen vanaf camera uploaden</string>
+    <string name="prefs_instant_upload_summary">Direct vanaf camera uploaden van afbeeldingen</string>
     <string name="prefs_instant_video_upload">Directe upload van video\'s</string>
     <string name="prefs_instant_video_upload_summary">Direct vanaf de camera uploaden video\'s</string>
     <string name="prefs_log_title">Logging inschakelen</string>
@@ -113,7 +113,8 @@ Kies er eentje van een provider.</string>
     <string name="file_list_empty_headline_server_search_photos">Geen foto\'s</string>
     <string name="file_list_empty_search">Misschien staat het in een andere map?</string>
     <string name="file_list_empty_recently_modified">Geen bestanden gevonden die de afgelopen 7 dagen werden gewijzigd</string>
-    <string name="file_list_empty_recently_modified_filter">Geen bestanden gevonden die de afgelopen 7 dagen werden bewerkt</string>
+    <string name="file_list_empty_recently_modified_filter">Je zoekopdracht vond geen bestanden die
+ in de laatste 7 dagen werden gewijzigd.</string>
     <string name="file_list_empty_recently_added">Geen recent toegevoegde bestanden gevonden</string>
     <string name="file_list_empty_recently_added_filter">Geen recent toegevoegde bestanden gevonden voor je zoekopdracht!</string>
     <string name="file_list_empty_text_photos">Upload enkele foto\'s of activeer auto-upload.</string>
@@ -155,6 +156,7 @@ Kies er eentje van een provider.</string>
     <string name="about_title">Over</string>
     <string name="change_password">Wachtwoord wijzigen</string>
     <string name="delete_account">Account verwijderen</string>
+    <string name="delete_account_warning">Account %s verwijderen?\n\nDit kan niet ongedaan gemaakt worden.</string>
     <string name="create_account">Account aanmaken</string>
     <string name="upload_chooser_title">Upload van &#8230;</string>
     <string name="uploader_info_dirname">Mapnaam</string>
@@ -303,8 +305,8 @@ Kies er eentje van een provider.</string>
     <string name="activity_chooser_title">Verstuur link naar &#8230;</string>
     <string name="wait_for_tmp_copy_from_private_storage">Bestand vanaf privéopslag kopiëren</string>
     
-    <string name="oauth_check_onoff">Inloggen met OAuth 2.0</string> 
-    <string name="oauth_login_connection">Verbinden met OAuth 2.0 server…</string>    
+    <string name="oauth_check_onoff">Inloggen met oAuth2</string> 
+    <string name="oauth_login_connection">Verbinden met OAuth 2 server…</string>    
         
     <string name="ssl_validator_header">De identiteit van de site kan niet worden gecontroleerd</string>
     <string name="ssl_validator_reason_cert_not_trusted">- Het servercertificaat wordt niet vertrouwd</string>
@@ -347,7 +349,6 @@ Kies er eentje van een provider.</string>
     <string name="instant_video_upload_on_charging">Alleen uploaden bij opladen</string>
     <string name="instant_upload_on_charging">Alleen uploaden bij opladen</string>
     <string name="instant_upload_path">/InstantUpload</string>
-    <string name="auto_upload_path">/AutomatischUploaden</string>
     <string name="conflict_title">Bestandsconflict</string>
     <string name="conflict_message">Welke bestanden wil je bewaren? Als je beide versies selecteert zal het lokale bestand een volgnummer aan de naam toegevoegd krijgen.</string>
     <string name="conflict_keep_both">Beide bewaren</string>
@@ -411,7 +412,14 @@ Kies er eentje van een provider.</string>
     <string name="file_migration_cleaning">Opruimen&#160;&#8230;</string>
     <string name="file_migration_restoring_accounts_configuration">Accountconfiguratie herstellen&#8230;</string>
     <string name="file_migration_ok_finished">Afgerond</string>
-    <string name="file_migration_directory_already_exists">Datamap bestaat al. Kies een van de volgende:</string>
+    <string name="file_migration_failed_not_enough_space">FOUT: Niet genoeg ruimte</string>
+    <string name="file_migration_failed_not_writable">FOUT: Doelbestand niet schrijfbaar</string>
+    <string name="file_migration_failed_not_readable">FOUT: Bronbestand niet leesbaar</string>
+    <string name="file_migration_failed_dir_already_exists">FOUT: Nextcloudmap bestaat al</string>
+    <string name="file_migration_failed_while_coping">FOUT: Tijdens migratie</string>
+    <string name="file_migration_failed_while_updating_index">FOUT: Tijdens bijwerken index</string>
+
+    <string name="file_migration_directory_already_exists">Gegevensmap bestaat al, wat te doen?</string>
     <string name="file_migration_override_data_folder">Vervangen</string>
     <string name="file_migration_use_data_folder">Gebruiken</string>
 
@@ -425,7 +433,7 @@ Kies er eentje van een provider.</string>
 
 	<string name="actionbar_logger">Logs</string>
 	<string name="log_send_history_button">Geschiedenis versturen</string>
-	<string name="log_send_no_mail_app">Geen applicatie gevonden voor het versturen van de logs. Installeer een email client.</string>
+	<string name="log_send_no_mail_app">Geen applicatie gevonden voor het versturen van de logs. Installeer een e-mailapplicatie.</string>
 	<string name="log_send_mail_subject">%1$s-Android-app-logs</string>
 	<string name="log_progress_dialog_text">Gegevens laden&#160;&#8230;</string>
 
@@ -475,7 +483,7 @@ Kies er eentje van een provider.</string>
     <string name="file_list__footer__files">%1$d bestanden</string>
     <string name="file_list__footer__files_and_folder">%1$d bestanden, 1 map</string>
     <string name="file_list__footer__files_and_folders">%1$d bestanden, %2$d mappen</string>
-    <string name="set_picture_as">Gebruik afbeelding als</string>
+    <string name="set_picture_as">Stel afbeelding in als</string>
     <string name="set_as">Stel in als</string>
 
     <string name="prefs_instant_behaviour_dialogTitle">Origineel bestand zal&#160;&#8230;</string>
@@ -549,16 +557,19 @@ Kies er eentje van een provider.</string>
     <string name="drawer_participate">Meedoen</string>
     <string name="participate_testing_headline">Help bij testen</string>
     <string name="participate_testing_bug_text">Bug gevonden? Rare dingen?</string>
+    <string name="participate_testing_report_text">Meld het op Github</string>
     <string name="participate_testing_version_text">Geïnteresseerd om ons te helpen de volgende versie te testen?</string>
     <string name="participate_beta_headline">Test de dev versie</string>
     <string name="participate_beta_text">Dit omvat alle komende opties en is zeer \'bleeding edge\'. Bugs/fouten kunnen voorkomen en in dat geval vragen we je die aan ons te melden.</string>
     <string name="participate_release_candidate_headline">Release candidate</string>
-    <string name="participate_release_candidate_text">De release candidate (RC) is een snapshot van de komende versie en is naar verwachting stabiel. Door een test met je eigen installatie verzeker je hier van. Meld je aan voor het testen in de Play store of kijk handmatig bij sectie \"Versie\" van F-Droid.</string>
+    <string name="participate_release_candidate_text">De Release Candidate (RC) is een kopie van de komende release en zou stabiel moeten zijn. Testen van jouw installatie kan ons helpen om dit te bevestigen. Meld je aan om te testen op de Play Store of bekijk handmatig de \"versies\"-sectie op F-Droid.</string>
     <string name="participate_contribute_headline">Actief meedoen</string>
-    <string name="participate_contribute_irc_text">Bezoek de IRC chat op IRC: &lt;font color=\"%1$s\">&lt;a href=\"%2$s\">#nextcloud-mobile&lt;/a>&lt;/font></string>
-    <string name="participate_contribute_forum_text">Help anderen op het &lt;font color=\"%1$s\">&lt;a href=\"%2$s\">forum&lt;/a>&lt;/font></string>
-    <string name="participate_contribute_translate_text">&lt;font color=\"%1$s\">&lt;a href=\"%2$s\">Vertaal&lt;/a>&lt;/font> de app</string>
-    <string name="participate_contribute_github_text">Bekijk, schrijf of pas code aan. Kijk in &lt;font color=\"%1$s\">&lt;a href=\"%2$s\">CONTRIBUTING.md&lt;/a>&lt;/font> voor meer details</string>
+    <string name="participate_contribute_irc_text">Bezoek de IRC chat op IRC: &lt;a href=\"%1$s\">#nextcloud-mobile&lt;/a>
+</string>
+    <string name="participate_contribute_forum_text">Help anderen op het &lt;a href=\"%1$s\">forum&lt;/a>
+</string>
+    <string name="participate_contribute_translate_text">&lt;a href=\"%1$s\">Vertaal&lt;/a> de app</string>
+    <string name="participate_contribute_github_text">Bekijk, schrijf of pas code aan. Kijk in &lt;a href=\"%1$s\">CONTRIBUTING.md&lt;a> voor meer details</string>
     <string name="move_to">Verplaats naar&#160;&#8230;</string>
     <string name="copy_to">Kopieer naar&#160;&#8230;</string>
     <string name="choose_remote_folder">Kies map&#160;&#8230;</string>
@@ -611,7 +622,7 @@ Kies er eentje van een provider.</string>
 
     <!-- User information -->
     <string name="user_info_full_name">Volledige naam</string>
-    <string name="user_info_email">Email</string>
+    <string name="user_info_email">E-mailadres</string>
     <string name="user_info_phone">Telefoonnummer</string>
     <string name="user_info_address">Adres</string>
     <string name="user_info_website">Website</string>
@@ -625,10 +636,13 @@ Kies er eentje van een provider.</string>
     <string name="webview_error">Er heeft zich een fout voorgedaan</string>
     <string name="prefs_category_about">Over</string>
 
-    <string name="actionbar_contacts">Maak een backup van de contacten</string>
+    <string name="actionbar_contacts">Contactpersonen backup</string>
     <string name="actionbar_contacts_restore">Herstellen contactpersonen</string>
-    <string name="contacts_backup_button">Maak nu een backup</string>
-    <string name="contacts_automatic_backup">Automatische backup</string>
+    <string name="contacts_backup_button">Nu backupppen</string>
+    <string name="contacts_restore_button">Herstel de laatste backup</string>
+    <string name="contacts_header_restore">Herstellen</string>
+    <string name="contacts_header_backup">Backuppen</string>
+    <string name="contacts_automatic_backup">Contactpersonen backup</string>
     <string name="contacts_last_backup">Laatsts backup</string>
     <string name="contacts_read_permission">Leesrechten voor contactpersonen vereist</string>
     <string name="contacts_write_permission">Schrijfrechten voor contactpersonen vereist</string>
@@ -648,8 +662,4 @@ Kies er eentje van een provider.</string>
     <string name="drawer_logout">Uitloggen</string>
     <string name="picture_set_as_no_app">Geen app gevonden om afbeelding in te stellen</string>
     <string name="privacy">Privacy</string>
-    <string name="file_not_found">Bestand niet gevonden!</string>
-
-    <string name="folder_sync_folders">Mappen instellen</string>
-
-  </resources>
+</resources>

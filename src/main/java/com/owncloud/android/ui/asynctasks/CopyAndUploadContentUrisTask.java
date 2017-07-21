@@ -255,7 +255,6 @@ public class CopyAndUploadContentUrisTask extends AsyncTask<Object, Void, Result
                         break;
                     default:
                         messageId = R.string.common_error_unknown;
-                        break;
                 }
                 String message = String.format(
                     mAppContext.getString(messageId),

@@ -28,8 +28,8 @@ import android.accounts.AccountManagerFuture;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -38,23 +38,19 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.URLUtil;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.owncloud.android.MainApp;
 import com.owncloud.android.R;
 import com.owncloud.android.authentication.AccountUtils;
-import com.owncloud.android.datamodel.ArbitraryDataProvider;
 import com.owncloud.android.datamodel.ExternalLinksProvider;
 import com.owncloud.android.datamodel.OCFile;
 import com.owncloud.android.lib.common.ExternalLink;
@@ -70,14 +66,12 @@ import com.owncloud.android.lib.resources.files.SearchOperation;
 import com.owncloud.android.lib.resources.users.GetRemoteUserInfoOperation;
 import com.owncloud.android.operations.GetCapabilitiesOperarion;
 import com.owncloud.android.ui.TextDrawable;
-import com.owncloud.android.ui.events.AccountRemovedEvent;
 import com.owncloud.android.ui.events.ChangeMenuEvent;
 import com.owncloud.android.ui.events.DummyDrawerEvent;
 import com.owncloud.android.ui.events.MenuItemClickEvent;
 import com.owncloud.android.ui.events.SearchEvent;
 import com.owncloud.android.ui.fragment.OCFileListFragment;
 import com.owncloud.android.utils.DisplayUtils;
-import com.owncloud.android.utils.ThemeUtils;
 import com.owncloud.android.utils.svg.MenuSimpleTarget;
 
 import org.greenrobot.eventbus.EventBus;
@@ -184,7 +178,6 @@ public abstract class DrawerActivity extends ToolbarActivity implements DisplayU
 
     private ExternalLinksProvider externalLinksProvider;
     private SharedPreferences sharedPreferences;
-    private ArbitraryDataProvider arbitraryDataProvider;
 
     /**
      * Initializes the drawer, its content and highlights the menu item with the given id.
@@ -257,44 +250,36 @@ public abstract class DrawerActivity extends ToolbarActivity implements DisplayU
         // Set the drawer toggle as the DrawerListener
         mDrawerLayout.addDrawerListener(mDrawerToggle);
         mDrawerToggle.setDrawerIndicatorEnabled(true);
-        mDrawerToggle.getDrawerArrowDrawable().setColor(ThemeUtils.fontColor());
     }
 
     /**
      * initializes and sets up the drawer header.
      */
     private void setupDrawerHeader() {
+        mAccountChooserToggle = (ImageView) findNavigationViewChildById(R.id.drawer_account_chooser_toogle);
+        mAccountChooserToggle.setImageResource(R.drawable.ic_down);
         mIsAccountChooserActive = false;
         mAccountMiddleAccountAvatar = (ImageView) findNavigationViewChildById(R.id.drawer_account_middle);
         mAccountEndAccountAvatar = (ImageView) findNavigationViewChildById(R.id.drawer_account_end);
 
-        mAccountChooserToggle = (ImageView) findNavigationViewChildById(R.id.drawer_account_chooser_toogle);
-        mAccountChooserToggle.setColorFilter(ThemeUtils.fontColor());
-
-        if (getResources().getBoolean(R.bool.allow_profile_click)) {
-            mAccountChooserToggle.setImageResource(R.drawable.ic_down);
-
-            findNavigationViewChildById(R.id.drawer_active_user)
-                    .setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            toggleAccountList();
-                        }
-                    });
-        } else {
-            mAccountChooserToggle.setVisibility(View.GONE);
-        }
+        findNavigationViewChildById(R.id.drawer_active_user)
+                .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        toggleAccountList();
+                    }
+                });
     }
 
     /**
      * setup quota elements of the drawer.
      */
     private void setupQuotaElement() {
-        mQuotaView = (LinearLayout) findQuotaViewById(R.id.drawer_quota);
-        mQuotaProgressBar = (ProgressBar) findQuotaViewById(R.id.drawer_quota_ProgressBar);
-        mQuotaTextPercentage = (TextView) findQuotaViewById(R.id.drawer_quota_percentage);
-        mQuotaTextLink = (TextView) findQuotaViewById(R.id.drawer_quota_link);
-        ThemeUtils.colorPreLollipopHorizontalProgressBar(mQuotaProgressBar);
+        mQuotaView = (LinearLayout) findViewById(R.id.drawer_quota);
+        mQuotaProgressBar = (ProgressBar) findViewById(R.id.drawer_quota_ProgressBar);
+        mQuotaTextPercentage = (TextView) findViewById(R.id.drawer_quota_percentage);
+        mQuotaTextLink = (TextView) findViewById(R.id.drawer_quota_link);
+        DisplayUtils.colorPreLollipopHorizontalProgressBar(mQuotaProgressBar);
     }
 
     /**
@@ -303,7 +288,11 @@ public abstract class DrawerActivity extends ToolbarActivity implements DisplayU
      * @param navigationView the drawers navigation view
      */
     protected void setupDrawerMenu(NavigationView navigationView) {
-        navigationView.setItemIconTintList(null);
+        // on pre lollipop the light theme adds a black tint to icons with white coloring
+        // ruining the generic avatars, so tinting for icons is deactivated pre lollipop
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            navigationView.setItemIconTintList(null);
+        }
 
         // setup actions for drawer menu items
         navigationView.setNavigationItemSelectedListener(
@@ -329,20 +318,21 @@ public abstract class DrawerActivity extends ToolbarActivity implements DisplayU
             navigationView.getMenu().setGroupVisible(R.id.drawer_menu_accounts, false);
         }
 
-        Account account = AccountUtils.getCurrentOwnCloudAccount(MainApp.getAppContext());
+        Account account = AccountUtils.
+                getCurrentOwnCloudAccount(MainApp.getAppContext());
         boolean searchSupported = AccountUtils.hasSearchSupport(account);
 
-        if (getResources().getBoolean(R.bool.bottom_toolbar_enabled) && account != null) {
-            navigationView.getMenu().removeItem(R.id.nav_all_files);
-            navigationView.getMenu().removeItem(R.id.nav_settings);
-            navigationView.getMenu().removeItem(R.id.nav_favorites);
+        if ((getResources().getBoolean(R.bool.bottom_toolbar_enabled) || (!searchSupported)) &&
+                (account != null)){
             navigationView.getMenu().removeItem(R.id.nav_photos);
-        }
-
-        if (!searchSupported && account != null) {
-            navigationView.getMenu().removeItem(R.id.nav_photos);
-            navigationView.getMenu().removeItem(R.id.nav_favorites);
-            navigationView.getMenu().removeItem(R.id.nav_videos);
+            if (getResources().getBoolean(R.bool.bottom_toolbar_enabled)) {
+                navigationView.getMenu().removeItem(R.id.nav_all_files);
+                navigationView.getMenu().removeItem(R.id.nav_settings);
+                navigationView.getMenu().removeItem(R.id.nav_favorites);
+            }
+            if (!searchSupported) {
+                navigationView.getMenu().removeItem(R.id.nav_videos);
+            }
         }
 
         if (getResources().getBoolean(R.bool.use_home) && navigationView.getMenu().findItem(R.id.nav_all_files) !=
@@ -360,13 +350,8 @@ public abstract class DrawerActivity extends ToolbarActivity implements DisplayU
             navigationView.getMenu().removeItem(R.id.nav_shared);
         }
 
-        if (!getResources().getBoolean(R.bool.contacts_backup)
-                || !getResources().getBoolean(R.bool.show_drawer_contacts_backup)) {
+        if (!getResources().getBoolean(R.bool.contacts_backup)) {
             navigationView.getMenu().removeItem(R.id.nav_contacts);
-        }
-
-        if (getResources().getBoolean(R.bool.syncedFolder_light)) {
-            navigationView.getMenu().removeItem(R.id.nav_folder_sync);
         }
 
         if (!getResources().getBoolean(R.bool.show_drawer_logout)) {
@@ -417,27 +402,36 @@ public abstract class DrawerActivity extends ToolbarActivity implements DisplayU
 
     private void selectNavigationItem(final MenuItem menuItem) {
 
-        setDrawerMenuItemChecked(menuItem.getItemId());
-
         switch (menuItem.getItemId()) {
             case R.id.nav_all_files:
+                menuItem.setChecked(true);
+                mCheckedMenuItem = menuItem.getItemId();
                 showFiles(false);
                 EventBus.getDefault().post(new ChangeMenuEvent());
                 break;
             case R.id.nav_favorites:
+                menuItem.setChecked(true);
+                mCheckedMenuItem = menuItem.getItemId();
+
                 switchToSearchFragment(new SearchEvent("", SearchOperation.SearchType.FAVORITE_SEARCH,
                         SearchEvent.UnsetType.NO_UNSET), menuItem);
                 break;
             case R.id.nav_photos:
+                menuItem.setChecked(true);
+                mCheckedMenuItem = menuItem.getItemId();
+
                 switchToSearchFragment(new SearchEvent("image/%", SearchOperation.SearchType.CONTENT_TYPE_SEARCH,
                         SearchEvent.UnsetType.NO_UNSET), menuItem);
                 break;
             case R.id.nav_on_device:
+                menuItem.setChecked(true);
+                mCheckedMenuItem = menuItem.getItemId();
                 EventBus.getDefault().post(new ChangeMenuEvent());
                 showFiles(true);
                 break;
             case R.id.nav_uploads:
-                Intent uploadListIntent = new Intent(getApplicationContext(), UploadListActivity.class);
+                Intent uploadListIntent = new Intent(getApplicationContext(),
+                        UploadListActivity.class);
                 uploadListIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(uploadListIntent);
                 break;
@@ -463,8 +457,10 @@ public abstract class DrawerActivity extends ToolbarActivity implements DisplayU
                 startActivity(settingsIntent);
                 break;
             case R.id.nav_participate:
-                Intent participateIntent = new Intent(getApplicationContext(), ParticipateActivity.class);
-                startActivity(participateIntent);
+                /*Intent participateIntent = new Intent(getApplicationContext(),
+                        ParticipateActivity.class);
+                startActivity(participateIntent);*/
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://suporte.loopin.cloud")));
                 break;
             case R.id.nav_logout:
                 mCheckedMenuItem = -1;
@@ -475,22 +471,35 @@ public abstract class DrawerActivity extends ToolbarActivity implements DisplayU
                 createAccount(false);
                 break;
             case R.id.drawer_menu_account_manage:
-                Intent manageAccountsIntent = new Intent(getApplicationContext(), ManageAccountsActivity.class);
+                Intent manageAccountsIntent = new Intent(getApplicationContext(),
+                        ManageAccountsActivity.class);
                 startActivityForResult(manageAccountsIntent, ACTION_MANAGE_ACCOUNTS);
                 break;
             case R.id.nav_recently_added:
+                menuItem.setChecked(true);
+                mCheckedMenuItem = menuItem.getItemId();
+
                 switchToSearchFragment(new SearchEvent("%",SearchOperation.SearchType.CONTENT_TYPE_SEARCH,
                         SearchEvent.UnsetType.UNSET_BOTTOM_NAV_BAR), menuItem);
                 break;
             case R.id.nav_recently_modified:
+                menuItem.setChecked(true);
+                mCheckedMenuItem = menuItem.getItemId();
+
                 switchToSearchFragment(new SearchEvent("", SearchOperation.SearchType.RECENTLY_MODIFIED_SEARCH,
                         SearchEvent.UnsetType.UNSET_BOTTOM_NAV_BAR), menuItem);
                 break;
             case R.id.nav_shared:
+                menuItem.setChecked(true);
+                mCheckedMenuItem = menuItem.getItemId();
+
                 switchToSearchFragment(new SearchEvent("", SearchOperation.SearchType.SHARED_SEARCH,
                         SearchEvent.UnsetType.UNSET_BOTTOM_NAV_BAR), menuItem);
                 break;
             case R.id.nav_videos:
+                menuItem.setChecked(true);
+                mCheckedMenuItem = menuItem.getItemId();
+
                 switchToSearchFragment(new SearchEvent("video/%", SearchOperation.SearchType.CONTENT_TYPE_SEARCH,
                         SearchEvent.UnsetType.UNSET_BOTTOM_NAV_BAR), menuItem);
                 break;
@@ -501,10 +510,8 @@ public abstract class DrawerActivity extends ToolbarActivity implements DisplayU
             case Menu.NONE:
                 // account clicked
                 accountClicked(menuItem.getTitle().toString());
-                break;
             default:
                 Log_OC.i(TAG, "Unknown drawer menu item clicked: " + menuItem.getTitle());
-                break;
         }
     }
 
@@ -608,7 +615,7 @@ public abstract class DrawerActivity extends ToolbarActivity implements DisplayU
     /**
      * Enable or disable the drawer indicator.
      *
-     * @param enable true to enable, false to disable
+     * @param enable <code>true</code> to enable, <code>false</code> to disable
      */
     public void setDrawerIndicatorEnabled(boolean enable) {
         if (mDrawerToggle != null) {
@@ -621,21 +628,9 @@ public abstract class DrawerActivity extends ToolbarActivity implements DisplayU
      */
     public void updateAccountList() {
         Account[] accounts = AccountManager.get(this).getAccountsByType(MainApp.getAccountType());
-
-        ArrayList<Account> persistingAccounts = new ArrayList<>();
-
-        for (Account acc: accounts) {
-            boolean pendingForRemoval = arbitraryDataProvider.getBooleanValue(acc,
-                    ManageAccountsActivity.PENDING_FOR_REMOVAL);
-
-            if (!pendingForRemoval) {
-                persistingAccounts.add(acc);
-            }
-        }
-
         if (mNavigationView != null && mDrawerLayout != null) {
-            if (persistingAccounts.size() > 0) {
-                repopulateAccountList(persistingAccounts);
+            if (accounts.length > 0) {
+                repopulateAccountList(accounts);
                 setAccountInDrawer(AccountUtils.getCurrentOwnCloudAccount(this));
                 populateDrawerOwnCloudAccounts();
 
@@ -670,24 +665,25 @@ public abstract class DrawerActivity extends ToolbarActivity implements DisplayU
      *
      * @param accounts list of accounts
      */
-    private void repopulateAccountList(ArrayList<Account> accounts) {
+    private void repopulateAccountList(Account[] accounts) {
         // remove all accounts from list
         mNavigationView.getMenu().removeGroup(R.id.drawer_menu_accounts);
 
         // add all accounts to list
-        for (Account account: accounts) {
+        for (int i = 0; i < accounts.length; i++) {
             try {
-                // show all accounts except the currently active one and those pending for removal
-
-                if (!getAccount().name.equals(account.name)) {
+                // show all accounts except the currently active one
+                if (!getAccount().name.equals(accounts[i].name)) {
                     MenuItem accountMenuItem = mNavigationView.getMenu().add(
                             R.id.drawer_menu_accounts,
                             Menu.NONE,
                             MENU_ORDER_ACCOUNT,
-                            account.name)
-                            .setIcon(TextDrawable.createAvatar(account.name, mMenuAccountAvatarRadiusDimension));
-                    DisplayUtils.setAvatar(account, this, mMenuAccountAvatarRadiusDimension, getResources(),
-                            getStorageManager(), accountMenuItem);
+                            accounts[i].name)
+                            .setIcon(TextDrawable.createAvatar(
+                                    accounts[i].name,
+                                    mMenuAccountAvatarRadiusDimension)
+                            );
+                    DisplayUtils.setAvatar(accounts[i], this, mMenuAccountAvatarRadiusDimension, getResources(), getStorageManager(), accountMenuItem);
                 }
             } catch (Exception e) {
                 Log_OC.e(TAG, "Error calculating RGB value for account menu item.", e);
@@ -695,7 +691,7 @@ public abstract class DrawerActivity extends ToolbarActivity implements DisplayU
                         R.id.drawer_menu_accounts,
                         Menu.NONE,
                         MENU_ORDER_ACCOUNT,
-                        account.name)
+                        accounts[i].name)
                         .setIcon(R.drawable.ic_user);
             }
         }
@@ -739,11 +735,9 @@ public abstract class DrawerActivity extends ToolbarActivity implements DisplayU
             TextView username = (TextView) findNavigationViewChildById(R.id.drawer_username);
             TextView usernameFull = (TextView) findNavigationViewChildById(R.id.drawer_username_full);
             usernameFull.setText(account.name);
-            usernameFull.setTextColor(ThemeUtils.fontColor());
             try {
                 OwnCloudAccount oca = new OwnCloudAccount(account, this);
                 username.setText(oca.getDisplayName());
-                username.setTextColor(ThemeUtils.fontColor());
             } catch (com.owncloud.android.lib.common.accounts.AccountUtils.AccountNotFoundException e) {
                 Log_OC.w(TAG, "Couldn't read display name of account fallback to account name");
                 username.setText(AccountUtils.getAccountUsername(account.name));
@@ -772,9 +766,7 @@ public abstract class DrawerActivity extends ToolbarActivity implements DisplayU
     private void showMenu() {
         if (mNavigationView != null) {
             if (mIsAccountChooserActive) {
-                if (mAccountChooserToggle != null) {
-                    mAccountChooserToggle.setImageResource(R.drawable.ic_up);
-                }
+                mAccountChooserToggle.setImageResource(R.drawable.ic_up);
                 mNavigationView.getMenu().setGroupVisible(R.id.drawer_menu_accounts, true);
 
                 if (!getResources().getBoolean(R.bool.multiaccount_support) &&
@@ -786,9 +778,7 @@ public abstract class DrawerActivity extends ToolbarActivity implements DisplayU
                 mNavigationView.getMenu().setGroupVisible(R.id.drawer_menu_external_links, false);
                 mNavigationView.getMenu().setGroupVisible(R.id.drawer_menu_bottom, false);
             } else {
-                if (mAccountChooserToggle != null) {
-                    mAccountChooserToggle.setImageResource(R.drawable.ic_down);
-                }
+                mAccountChooserToggle.setImageResource(R.drawable.ic_down);
                 mNavigationView.getMenu().setGroupVisible(R.id.drawer_menu_accounts, false);
                 mNavigationView.getMenu().setGroupVisible(R.id.drawer_menu_standard, true);
                 mNavigationView.getMenu().setGroupVisible(R.id.drawer_menu_external_links, true);
@@ -819,7 +809,7 @@ public abstract class DrawerActivity extends ToolbarActivity implements DisplayU
      */
     private void setQuotaInformation(long usedSpace, long totalSpace, int relative) {
         mQuotaProgressBar.setProgress(relative);
-        ThemeUtils.colorHorizontalProgressBar(mQuotaProgressBar, DisplayUtils.getRelativeInfoColor(this, relative));
+        DisplayUtils.colorHorizontalProgressBar(mQuotaProgressBar, DisplayUtils.getRelativeInfoColor(this, relative));
 
         updateQuotaLink();
 
@@ -904,27 +894,9 @@ public abstract class DrawerActivity extends ToolbarActivity implements DisplayU
      * @param menuItemId the menu item to be highlighted
      */
     protected void setDrawerMenuItemChecked(int menuItemId) {
-        if (mNavigationView != null && mNavigationView.getMenu() != null &&
-                mNavigationView.getMenu().findItem(menuItemId) != null) {
-
-            MenuItem item = mNavigationView.getMenu().findItem(menuItemId);
-            item.setChecked(true);
-
-            // reset all tinted icons
-            for (int i = 0; i < mNavigationView.getMenu().size(); i++) {
-                MenuItem menuItem = mNavigationView.getMenu().getItem(i);
-                if (menuItem.getIcon() != null) {
-                    menuItem.getIcon().clearColorFilter();
-                    menuItem.setTitle(Html.fromHtml("<font color='#000000'>" + menuItem.getTitle() + "</font>"));
-                }
-            }
-
-            int darkColor = ThemeUtils.primaryDarkColor();
-            ThemeUtils.tintDrawable(item.getIcon(), darkColor);
-
-            String colorHex = ThemeUtils.colorToHexString(darkColor);
-            item.setTitle(Html.fromHtml("<font color='" + colorHex + "'>" + item.getTitle() + "</font>"));
-
+        if (mNavigationView != null && mNavigationView.getMenu() != null && mNavigationView.getMenu().findItem
+                (menuItemId) != null) {
+            mNavigationView.getMenu().findItem(menuItemId).setChecked(true);
             mCheckedMenuItem = menuItemId;
         } else {
             Log_OC.w(TAG, "setDrawerMenuItemChecked has been called with invalid menu-item-ID");
@@ -1016,43 +988,6 @@ public abstract class DrawerActivity extends ToolbarActivity implements DisplayU
         }
     }
 
-    public void updateHeaderBackground() {
-        if (getAccount() != null &&
-                getStorageManager().getCapability(getAccount().name).getServerBackground() != null) {
-            final LinearLayout navigationHeader = (LinearLayout) findNavigationViewChildById(R.id.drawer_header_view);
-
-            if (navigationHeader != null) {
-                String background = getStorageManager().getCapability(getAccount().name).getServerBackground();
-
-                if (URLUtil.isValidUrl(background) || background.isEmpty()) {
-                    // background image
-                    SimpleTarget target = new SimpleTarget<Drawable>() {
-                        @Override
-                        public void onResourceReady(Drawable resource, GlideAnimation glideAnimation) {
-                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-                                navigationHeader.setBackgroundDrawable(resource);
-                            } else {
-                                navigationHeader.setBackground(resource);
-                            }
-                        }
-                    };
-
-                    Glide.with(this)
-                            .load(background)
-                            .centerCrop()
-                            .placeholder(R.drawable.background)
-                            .error(R.drawable.background)
-                            .crossFade()
-                            .into(target);
-                } else {
-                    // plain color
-                    int color = Color.parseColor(background);
-                    navigationHeader.setBackgroundColor(color);
-                }
-            }
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -1070,7 +1005,6 @@ public abstract class DrawerActivity extends ToolbarActivity implements DisplayU
                 .getDimension(R.dimen.nav_drawer_menu_avatar_radius);
 
         externalLinksProvider = new ExternalLinksProvider(MainApp.getAppContext().getContentResolver());
-        arbitraryDataProvider = new ArbitraryDataProvider(getContentResolver());
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     }
@@ -1112,7 +1046,6 @@ public abstract class DrawerActivity extends ToolbarActivity implements DisplayU
         updateAccountList();
         updateExternalLinksInDrawer();
         updateQuotaLink();
-        updateHeaderBackground();
     }
 
     @Override
@@ -1145,13 +1078,13 @@ public abstract class DrawerActivity extends ToolbarActivity implements DisplayU
         // update Account list and active account if Manage Account activity replies with
         // - ACCOUNT_LIST_CHANGED = true
         // - RESULT_OK
-        if (requestCode == ACTION_MANAGE_ACCOUNTS && resultCode == RESULT_OK
+        if (requestCode == ACTION_MANAGE_ACCOUNTS
+                && resultCode == RESULT_OK
                 && data.getBooleanExtra(ManageAccountsActivity.KEY_ACCOUNT_LIST_CHANGED, false)) {
 
             // current account has changed
             if (data.getBooleanExtra(ManageAccountsActivity.KEY_CURRENT_ACCOUNT_CHANGED, false)) {
                 setAccount(AccountUtils.getCurrentOwnCloudAccount(this));
-                updateAccountList();
                 restart();
             } else {
                 updateAccountList();
@@ -1166,29 +1099,7 @@ public abstract class DrawerActivity extends ToolbarActivity implements DisplayU
      * @return The view if found or <code>null</code> otherwise.
      */
     private View findNavigationViewChildById(int id) {
-        NavigationView view = ((NavigationView) findViewById(R.id.nav_view));
-
-        if (view != null) {
-            return view.getHeaderView(0).findViewById(id);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Quota view can be either at navigation bottom or header
-     *
-     * @param id the view's id
-     * @return The view if found or <code>null</code> otherwise.
-     */
-    private View findQuotaViewById(int id) {
-        View v = ((NavigationView) findViewById(R.id.nav_view)).getHeaderView(0).findViewById(id);
-
-        if (v != null) {
-            return v;
-        } else {
-            return findViewById(id);
-        }
+        return ((NavigationView) findViewById(R.id.nav_view)).getHeaderView(0).findViewById(id);
     }
 
     /**
@@ -1209,26 +1120,15 @@ public abstract class DrawerActivity extends ToolbarActivity implements DisplayU
      */
     private void populateDrawerOwnCloudAccounts() {
         mAvatars = new Account[3];
-        Account[] accountsAll = AccountManager.get(this).getAccountsByType(MainApp.getAccountType());
-
-        ArrayList<Account> persistingAccounts = new ArrayList<>();
-
-        for (Account acc: accountsAll) {
-            boolean pendingForRemoval = arbitraryDataProvider.getBooleanValue(acc,
-                    ManageAccountsActivity.PENDING_FOR_REMOVAL);
-
-            if (!pendingForRemoval) {
-                persistingAccounts.add(acc);
-            }
-        }
-
+        Account[] accountsAll = AccountManager.get(this).getAccountsByType
+                (MainApp.getAccountType());
         Account currentAccount = AccountUtils.getCurrentOwnCloudAccount(this);
 
         mAvatars[0] = currentAccount;
         int j = 0;
-        for (int i = 1; i <= 2 && i < persistingAccounts.size() && j < persistingAccounts.size(); j++) {
-            if (!currentAccount.equals(persistingAccounts.get(j))) {
-                mAvatars[i] = persistingAccounts.get(j);
+        for (int i = 1; i <= 2 && i < accountsAll.length && j < accountsAll.length; j++) {
+            if (!currentAccount.equals(accountsAll[j])) {
+                mAvatars[i] = accountsAll[j];
                 i++;
             }
         }
@@ -1284,11 +1184,6 @@ public abstract class DrawerActivity extends ToolbarActivity implements DisplayU
     protected void onStop() {
         EventBus.getDefault().unregister(this);
         super.onStop();
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onAccountRemovedEvent(AccountRemovedEvent event) {
-        updateAccountList();
     }
 
     /**

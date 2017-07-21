@@ -90,48 +90,42 @@ public class UploaderAdapter extends SimpleAdapter {
             fileSizeV.setVisibility(View.GONE);
             fileSizeSeparatorV.setVisibility(View.GONE);
         }
-
-        if (file.isFolder()) {
-            fileIcon.setImageDrawable(MimeTypeUtil.getFolderTypeIcon(file.isSharedWithMe() ||
-                    file.isSharedWithSharee(), file.isSharedViaLink(), mAccount));
-        } else {
-            // get Thumbnail if file is image
-            if (MimeTypeUtil.isImage(file) && file.getRemoteId() != null) {
-                // Thumbnail in Cache?
-                Bitmap thumbnail = ThumbnailsCacheManager.getBitmapFromDiskCache(
-                        String.valueOf(file.getRemoteId())
-                );
-                if (thumbnail != null && !file.needsUpdateThumbnail()) {
-                    fileIcon.setImageBitmap(thumbnail);
-                } else {
-                    // generate new Thumbnail
-                    if (ThumbnailsCacheManager.cancelPotentialThumbnailWork(file, fileIcon)) {
-                        final ThumbnailsCacheManager.ThumbnailGenerationTask task =
-                                new ThumbnailsCacheManager.ThumbnailGenerationTask(fileIcon, mStorageManager,
-                                        mAccount);
-                        if (thumbnail == null) {
-                            if (MimeTypeUtil.isVideo(file)) {
-                                thumbnail = ThumbnailsCacheManager.mDefaultVideo;
-                            } else {
-                                thumbnail = ThumbnailsCacheManager.mDefaultImg;
-                            }
-                        }
-                        final AsyncThumbnailDrawable asyncDrawable = new AsyncThumbnailDrawable(
-                                mContext.getResources(),
-                                thumbnail,
-                                task
-                        );
-                        fileIcon.setImageDrawable(asyncDrawable);
-                        task.execute(file);
-                    }
-                }
+        
+        // get Thumbnail if file is image
+        if (MimeTypeUtil.isImage(file) && file.getRemoteId() != null) {
+             // Thumbnail in Cache?
+            Bitmap thumbnail = ThumbnailsCacheManager.getBitmapFromDiskCache(
+                    String.valueOf(file.getRemoteId())
+            );
+            if (thumbnail != null && !file.needsUpdateThumbnail()){
+                fileIcon.setImageBitmap(thumbnail);
             } else {
-                fileIcon.setImageResource(
-                        MimeTypeUtil.getFileTypeIconId(file.getMimetype(), file.getFileName())
-                );
+                // generate new Thumbnail
+                if (ThumbnailsCacheManager.cancelPotentialThumbnailWork(file, fileIcon)) {
+                    final ThumbnailsCacheManager.ThumbnailGenerationTask task = 
+                            new ThumbnailsCacheManager.ThumbnailGenerationTask(fileIcon, mStorageManager, 
+                                    mAccount);
+                    if (thumbnail == null) {
+                        if (MimeTypeUtil.isVideo(file)) {
+                            thumbnail = ThumbnailsCacheManager.mDefaultVideo;
+                        } else {
+                            thumbnail = ThumbnailsCacheManager.mDefaultImg;
+                        }
+                    }
+                    final AsyncThumbnailDrawable asyncDrawable = new AsyncThumbnailDrawable(
+                            mContext.getResources(), 
+                            thumbnail, 
+                            task
+                    );
+                    fileIcon.setImageDrawable(asyncDrawable);
+                    task.execute(file);
+                }
             }
+        } else {
+            fileIcon.setImageResource(
+                    MimeTypeUtil.getFileTypeIconId(file.getMimetype(), file.getFileName())
+            );
         }
-
         return vi;
     }
 

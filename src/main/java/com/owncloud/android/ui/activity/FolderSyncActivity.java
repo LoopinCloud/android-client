@@ -1,20 +1,20 @@
-/*
+/**
  * Nextcloud Android client application
  *
  * @author Andy Scherzinger
  * Copyright (C) 2016 Andy Scherzinger
  * Copyright (C) 2016 Nextcloud
- *
+ * <p>
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
  * License as published by the Free Software Foundation; either
  * version 3 of the License, or any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU AFFERO GENERAL PUBLIC LICENSE for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Affero General Public
  * License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -23,15 +23,12 @@ package com.owncloud.android.ui.activity;
 
 import android.accounts.Account;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
@@ -55,8 +52,6 @@ import com.owncloud.android.ui.dialog.SyncedFolderPreferencesDialogFragment;
 import com.owncloud.android.ui.dialog.parcel.SyncedFolderParcelable;
 import com.owncloud.android.utils.AnalyticsUtils;
 import com.owncloud.android.utils.DisplayUtils;
-import com.owncloud.android.utils.PermissionUtil;
-import com.owncloud.android.utils.ThemeUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -77,7 +72,6 @@ public class FolderSyncActivity extends FileActivity implements FolderSyncAdapte
 
     private static final String SYNCED_FOLDER_PREFERENCES_DIALOG_TAG = "SYNCED_FOLDER_PREFERENCES_DIALOG";
     public static final String PRIORITIZED_FOLDER = "Camera";
-    public static final String EXTRA_SHOW_SIDEBAR = "SHOW_SIDEBAR";
 
     private static final String SCREEN_NAME = "Auto upload";
 
@@ -90,15 +84,10 @@ public class FolderSyncActivity extends FileActivity implements FolderSyncAdapte
     private SyncedFolderProvider mSyncedFolderProvider;
     private List<SyncedFolderDisplayItem> syncFolderItems;
     private SyncedFolderPreferencesDialogFragment mSyncedFolderPreferencesDialogFragment;
-    private boolean showSidebar = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (getIntent().getExtras() != null) {
-            showSidebar = getIntent().getExtras().getBoolean(EXTRA_SHOW_SIDEBAR);
-        }
 
         setContentView(R.layout.folder_sync_layout);
 
@@ -107,23 +96,9 @@ public class FolderSyncActivity extends FileActivity implements FolderSyncAdapte
 
         // setup drawer
         setupDrawer(R.id.nav_folder_sync);
-
-        if (!showSidebar) {
-            setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-            mDrawerToggle.setDrawerIndicatorEnabled(false);
-        }
+        getSupportActionBar().setTitle(getString(R.string.drawer_folder_sync));
 
         setupContent();
-
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            ThemeUtils.setColoredTitle(getSupportActionBar(), getString(R.string.drawer_folder_sync));
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
-
-        if (ThemeUtils.themingEnabled()) {
-            setTheme(R.style.FallbackThemingTheme);
-        }
     }
 
     @Override
@@ -142,8 +117,7 @@ public class FolderSyncActivity extends FileActivity implements FolderSyncAdapte
         mEmpty = (TextView) findViewById(android.R.id.empty);
 
         final int gridWidth = getResources().getInteger(R.integer.media_grid_width);
-        boolean lightVersion = getResources().getBoolean(R.bool.syncedFolder_light);
-        mAdapter = new FolderSyncAdapter(this, gridWidth, this, lightVersion);
+        mAdapter = new FolderSyncAdapter(this, gridWidth, this);
         mSyncedFolderProvider = new SyncedFolderProvider(getContentResolver());
 
         final GridLayoutManager lm = new GridLayoutManager(this, gridWidth);
@@ -160,7 +134,7 @@ public class FolderSyncActivity extends FileActivity implements FolderSyncAdapte
             DisplayUtils.setupBottomBar(bottomNavigationView, getResources(), this, -1);
         }
 
-        load(gridWidth * 2, false);
+        load(gridWidth * 2);
     }
 
     /**
@@ -168,8 +142,8 @@ public class FolderSyncActivity extends FileActivity implements FolderSyncAdapte
      *
      * @param perFolderMediaItemLimit the amount of media items to be loaded/shown per media folder
      */
-    private void load(final int perFolderMediaItemLimit, boolean force) {
-        if (mAdapter.getItemCount() > 0 && !force) {
+    private void load(final int perFolderMediaItemLimit) {
+        if (mAdapter.getItemCount() > 0) {
             return;
         }
         setListShown(false);
@@ -178,9 +152,9 @@ public class FolderSyncActivity extends FileActivity implements FolderSyncAdapte
             @Override
             public void run() {
                 final List<MediaFolder> mediaFolders = MediaProvider.getMediaFolders(getContentResolver(),
-                        perFolderMediaItemLimit, FolderSyncActivity.this);
+                        perFolderMediaItemLimit);
                 List<SyncedFolder> syncedFolderArrayList = mSyncedFolderProvider.getSyncedFolders();
-                List<SyncedFolder> currentAccountSyncedFoldersList = new ArrayList<>();
+                List<SyncedFolder> currentAccountSyncedFoldersList = new ArrayList<SyncedFolder>();
                 Account currentAccount = AccountUtils.getCurrentOwnCloudAccount(FolderSyncActivity.this);
                 for (SyncedFolder syncedFolder : syncedFolderArrayList) {
                     if (syncedFolder.getAccount().equals(currentAccount.name)) {
@@ -353,7 +327,6 @@ public class FolderSyncActivity extends FileActivity implements FolderSyncAdapte
         }
         return result;
     }
-
     /**
      * show/hide recycler view list or the empty message / progress info.
      *
@@ -372,22 +345,16 @@ public class FolderSyncActivity extends FileActivity implements FolderSyncAdapte
         boolean result = true;
         switch (item.getItemId()) {
             case android.R.id.home: {
-                if (showSidebar) {
-                    if (isDrawerOpen()) {
-                        closeDrawer();
-                    } else {
-                        openDrawer();
-                    }
+                if (isDrawerOpen()) {
+                    closeDrawer();
                 } else {
-                    Intent settingsIntent = new Intent(getApplicationContext(), Preferences.class);
-                    startActivity(settingsIntent);
+                    openDrawer();
                 }
                 break;
             }
 
             default:
                 result = super.onOptionsItemSelected(item);
-                break;
         }
         return result;
     }
@@ -464,7 +431,7 @@ public class FolderSyncActivity extends FileActivity implements FolderSyncAdapte
         }
         mSyncedFolderPreferencesDialogFragment = null;
 
-        if (dirty) {
+        if(dirty) {
             mAdapter.setSyncFolderItem(syncedFolder.getSection(), item);
         }
     }
@@ -503,26 +470,5 @@ public class FolderSyncActivity extends FileActivity implements FolderSyncAdapte
         item.setUploadAction(uploadAction);
         item.setEnabled(enabled);
         return item;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
-                                           @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case PermissionUtil.PERMISSIONS_WRITE_EXTERNAL_STORAGE: {
-                // If request is cancelled, result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted
-                    int gridWidth = getResources().getInteger(R.integer.media_grid_width);
-                    load(gridWidth * 2, true);
-                } else {
-                    // permission denied --> do nothing
-                    return;
-                }
-                return;
-            }
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
     }
 }

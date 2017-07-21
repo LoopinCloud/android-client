@@ -13,7 +13,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.2'
+        classpath 'com.android.tools.build:gradle:2.3.3'
         classpath 'com.google.gms:google-services:3.0.0'
     }
 }
@@ -52,6 +52,7 @@ repositories {
 android {
     lintOptions {
         abortOnError false
+        lintConfig file("${project.rootDir}/lint.xml")
         htmlReport true
         htmlOutput file("$project.buildDir/reports/lint/lint.html")
         disable 'MissingTranslation'
@@ -80,11 +81,11 @@ android {
         productFlavors {
             // used for f-droid
             generic {
-                applicationId 'com.nextcloud.client'
+                applicationId 'cloud.loopin.android'
             }
 
             gplay {
-                applicationId 'com.nextcloud.client'
+                applicationId 'cloud.loopin.android'
             }
 
             modified {
@@ -178,13 +179,13 @@ dependencies {
     compile name: 'touch-image-view'
     compile 'com.android.support:multidex:1.0.1'
 
-    compile 'com.github.nextcloud:android-library:1.0.22'
+    compile 'com.github.nextcloud:android-library:1.0.18'
     compile "com.android.support:support-v4:${supportLibraryVersion}"
     compile "com.android.support:design:${supportLibraryVersion}"
     compile 'com.jakewharton:disklrucache:2.0.2'
     compile "com.android.support:appcompat-v7:${supportLibraryVersion}"
     compile "com.android.support:cardview-v7:${supportLibraryVersion}"
-    compile 'com.github.tobiasKaminsky:android-floating-action-button:1.10.2'
+    compile 'com.getbase:floatingactionbutton:1.10.1'
     compile 'com.google.code.findbugs:annotations:2.0.1'
     compile group: 'commons-io', name: 'commons-io', version: '2.4'
     compile 'com.github.evernote:android-job:v1.1.9'

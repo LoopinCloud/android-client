@@ -21,7 +21,6 @@
 package com.owncloud.android.ui.fragment;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.SparseBooleanArray;
@@ -38,7 +37,6 @@ import com.owncloud.android.lib.common.utils.Log_OC;
 import com.owncloud.android.ui.adapter.LocalFileListAdapter;
 import com.owncloud.android.utils.AnalyticsUtils;
 import com.owncloud.android.utils.FileStorageUtils;
-import com.owncloud.android.utils.ThemeUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -100,8 +98,9 @@ public class LocalFileListFragment extends ExtendedListFragment {
         setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         setSwipeEnabled(false); // Disable pull-to-refresh
         setFabEnabled(false); // Disable FAB
-        setMessageForEmptyList(R.string.file_list_empty_headline, R.string.local_file_list_empty,
-                R.drawable.ic_list_empty_folder, true);
+        setMessageForEmptyList(
+                R.string.file_list_empty_headline, R.string.local_file_list_empty, R.drawable.ic_list_empty_folder
+        );
         Log_OC.i(TAG, "onCreateView() end");
         return v;
     }
@@ -143,12 +142,8 @@ public class LocalFileListFragment extends ExtendedListFragment {
                 ImageView checkBoxV = (ImageView) v.findViewById(R.id.custom_checkbox);
                 if (checkBoxV != null) {
                     if (getListView().isItemChecked(position)) {
-                        v.setBackgroundColor(getContext().getResources().getColor(R.color.selected_item_background));
-                        checkBoxV.setImageDrawable(ThemeUtils.tintDrawable(R.drawable.ic_checkbox_marked,
-                                ThemeUtils.primaryColor()));
-
+                        checkBoxV.setImageResource(R.drawable.ic_checkbox_marked);
                     } else {
-                        v.setBackgroundColor(Color.WHITE);
                         checkBoxV.setImageResource(R.drawable.ic_checkbox_blank_outline);
                     }
                 }
@@ -294,7 +289,7 @@ public class LocalFileListFragment extends ExtendedListFragment {
          *  
          * @param directory
          */
-        void onDirectoryClick(File directory);
+        public void onDirectoryClick(File directory);
         
         /**
          * Callback method invoked when a file (non directory)
@@ -302,7 +297,7 @@ public class LocalFileListFragment extends ExtendedListFragment {
          *  
          * @param file
          */
-        void onFileClick(File file);
+        public void onFileClick(File file);
         
         
         /**
@@ -311,7 +306,7 @@ public class LocalFileListFragment extends ExtendedListFragment {
          * 
          * @return  Directory to list firstly. Can be NULL.
          */
-        File getInitialDirectory();
+        public File getInitialDirectory();
 
     }
 

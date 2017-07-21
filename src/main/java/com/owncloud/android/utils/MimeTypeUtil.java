@@ -1,25 +1,23 @@
 /**
  * ownCloud Android client application
- * <p>
+ *
  * Copyright (C) 2016 ownCloud Inc.
- * <p>
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2,
  * as published by the Free Software Foundation.
- * <p>
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * <p>
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.owncloud.android.utils;
 
-import android.accounts.Account;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.webkit.MimeTypeMap;
 
@@ -93,39 +91,18 @@ public class MimeTypeUtil {
      * Returns the resource identifier of an image to use as icon associated to a type of folder.
      *
      * @param isSharedViaUsers flag if the folder is shared via the users system
-     * @param isSharedViaLink  flag if the folder is publicly shared via link
-     * @return Identifier of an image resource.
-     */
-    public static Drawable getFolderTypeIcon(boolean isSharedViaUsers, boolean isSharedViaLink) {
-        return getFolderTypeIcon(isSharedViaUsers, isSharedViaLink, null);
-    }
-
-    /**
-     * Returns the resource identifier of an image to use as icon associated to a type of folder.
-     *
-     * @param isSharedViaUsers flag if the folder is shared via the users system
      * @param isSharedViaLink flag if the folder is publicly shared via link
-     * @param account account which color should be used
      * @return Identifier of an image resource.
      */
-    public static Drawable getFolderTypeIcon(boolean isSharedViaUsers, boolean isSharedViaLink, Account account) {
-        int drawableId;
-
+    public static int getFolderTypeIconId(boolean isSharedViaUsers, boolean isSharedViaLink) {
         if (isSharedViaLink) {
-            drawableId = R.drawable.folder_public;
+            return R.drawable.folder_public;
         } else if (isSharedViaUsers) {
-            drawableId = R.drawable.shared_with_me_folder;
-        } else {
-            drawableId = R.drawable.ic_menu_archive;
+            return R.drawable.shared_with_me_folder;
         }
 
-        return ThemeUtils.tintDrawable(drawableId, ThemeUtils.primaryColor(account));
+        return R.drawable.ic_menu_archive;
     }
-
-    public static Drawable getDefaultFolderIcon() {
-        return getFolderTypeIcon(false, false);
-    }
-
 
     /**
      * Returns a single MIME type of all the possible, by inspection of the file extension, and taking

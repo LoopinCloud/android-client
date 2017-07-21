@@ -22,10 +22,8 @@
 package com.owncloud.android.ui.fragment;
 
 import android.accounts.Account;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,7 +44,6 @@ import com.owncloud.android.lib.resources.shares.ShareType;
 import com.owncloud.android.lib.resources.status.OwnCloudVersion;
 import com.owncloud.android.ui.activity.FileActivity;
 import com.owncloud.android.utils.AnalyticsUtils;
-import com.owncloud.android.utils.ThemeUtils;
 
 public class EditShareFragment extends Fragment {
 
@@ -135,9 +132,6 @@ public class EditShareFragment extends Fragment {
         ((TextView)view.findViewById(R.id.editShareTitle)).setText(
                 getResources().getString(R.string.share_with_edit_title, mShare.getSharedWithDisplayName()));
 
-        View headerDivider = view.findViewById(R.id.share_header_divider);
-        headerDivider.getBackground().setColorFilter(ThemeUtils.primaryAccentColor(), PorterDuff.Mode.SRC_ATOP);
-
         // Setup layout
         refreshUiFromState(view);
 
@@ -160,42 +154,35 @@ public class EditShareFragment extends Fragment {
             boolean isNotReshareableFederatedSupported = (serverVersion != null &&
                     serverVersion.isNotReshareableFederatedSupported());
 
-            int accentColor = ThemeUtils.primaryAccentColor();
-
-            SwitchCompat shareSwitch = (SwitchCompat) editShareView.findViewById(R.id.canShareSwitch);
-            ThemeUtils.tintSwitch(shareSwitch, accentColor, true);
+            CompoundButton compound = (CompoundButton) editShareView.findViewById(R.id.canShareSwitch);
 
             if (isFederated) {
-                shareSwitch.setVisibility(View.INVISIBLE);
+                compound.setVisibility(View.INVISIBLE);
             }
-            shareSwitch.setChecked((sharePermissions & OCShare.SHARE_PERMISSION_FLAG) > 0);
+            compound.setChecked((sharePermissions & OCShare.SHARE_PERMISSION_FLAG) > 0);
 
-            SwitchCompat switchCompat = (SwitchCompat) editShareView.findViewById(R.id.canEditSwitch);
-            ThemeUtils.tintSwitch(switchCompat, accentColor, true);
+            compound = (CompoundButton) editShareView.findViewById(R.id.canEditSwitch);
             int anyUpdatePermission = OCShare.CREATE_PERMISSION_FLAG | OCShare.UPDATE_PERMISSION_FLAG |
                     OCShare.DELETE_PERMISSION_FLAG;
             boolean canEdit = (sharePermissions & anyUpdatePermission) > 0;
-            switchCompat.setChecked(canEdit);
+            compound.setChecked(canEdit);
 
             boolean areEditOptionsAvailable = !isFederated || isNotReshareableFederatedSupported;
 
             if (mFile.isFolder() && areEditOptionsAvailable) {
                 /// TODO change areEditOptionsAvailable in order to delete !isFederated
                 // from checking when iOS is ready
-                AppCompatCheckBox checkBox = (AppCompatCheckBox) editShareView.findViewById(R.id.canEditCreateCheckBox);
-                checkBox.setChecked((sharePermissions & OCShare.CREATE_PERMISSION_FLAG) > 0);
-                checkBox.setVisibility((canEdit) ? View.VISIBLE : View.GONE);
-                ThemeUtils.tintCheckbox(checkBox, accentColor);
+                compound = (CompoundButton) editShareView.findViewById(R.id.canEditCreateCheckBox);
+                compound.setChecked((sharePermissions & OCShare.CREATE_PERMISSION_FLAG) > 0);
+                compound.setVisibility((canEdit) ? View.VISIBLE : View.GONE);
 
-                checkBox = (AppCompatCheckBox) editShareView.findViewById(R.id.canEditChangeCheckBox);
-                checkBox.setChecked((sharePermissions & OCShare.UPDATE_PERMISSION_FLAG) > 0);
-                checkBox.setVisibility((canEdit) ? View.VISIBLE : View.GONE);
-                ThemeUtils.tintCheckbox(checkBox, accentColor);
+                compound = (CompoundButton) editShareView.findViewById(R.id.canEditChangeCheckBox);
+                compound.setChecked((sharePermissions & OCShare.UPDATE_PERMISSION_FLAG) > 0);
+                compound.setVisibility((canEdit) ? View.VISIBLE : View.GONE);
 
-                checkBox = (AppCompatCheckBox) editShareView.findViewById(R.id.canEditDeleteCheckBox);
-                checkBox.setChecked((sharePermissions & OCShare.DELETE_PERMISSION_FLAG) > 0);
-                checkBox.setVisibility((canEdit) ? View.VISIBLE : View.GONE);
-                ThemeUtils.tintCheckbox(checkBox, accentColor);
+                compound = (CompoundButton) editShareView.findViewById(R.id.canEditDeleteCheckBox);
+                compound.setChecked((sharePermissions & OCShare.DELETE_PERMISSION_FLAG) > 0);
+                compound.setVisibility((canEdit) ? View.VISIBLE : View.GONE);
             }
 
             setPermissionsListening(editShareView, true);

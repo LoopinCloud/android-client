@@ -77,7 +77,7 @@
             android:id="@+id/share_header_divider"
             android:layout_width="match_parent"
             android:layout_height="@dimen/standard_eighth_margin"
-            android:background="@color/primary"
+            android:background="@color/nc_blue"
             />
 
         <LinearLayout
@@ -122,7 +122,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:contentDescription="@string/share_add_user_or_group"
+                android:contentDescription="shareAddUserButton"
                 android:text="@string/share_add_user_or_group"
                 android:theme="@style/Button.Primary"/>
 
@@ -330,7 +330,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:contentDescription="@string/share_get_public_link_button"
+                    android:contentDescription="shareGetLinkButton"
                     android:text="@string/share_get_public_link_button"
                     android:theme="@style/Button.Primary"/>
 

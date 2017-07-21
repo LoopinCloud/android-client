@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="17.584616mm"
+   height="17.584616mm"
+   viewBox="0 0 17.584616 17.584616"
+   version="1.1"
+   id="svg68"
+   inkscape:export-filename="/home/leonidas/Downloads/android-stable-1.4.3/src/main/res/drawable-xxxhdpi/notification_icon.png"
+   inkscape:export-xdpi="138.38162"
+   inkscape:export-ydpi="138.38162"
+   inkscape:version="0.92.1 r"
+   sodipodi:docname="notification_icon.svg">
+  <defs
+     id="defs62" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="7.9195959"
+     inkscape:cx="21.454257"
+     inkscape:cy="35.55839"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:pagecheckerboard="true"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1920"
+     inkscape:window-height="1003"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata65">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(28.447069,-140.04103)">
+    <g
+       transform="matrix(0.27863542,0,0,0.27863542,-50.581935,157.4899)"
+       id="g40">
+      <g
+         id="g105"
+         transform="matrix(0.96119558,0,0,0.96119558,80.911309,-68.756079)">
+        <path
+           inkscape:export-ydpi="90"
+           inkscape:export-xdpi="90"
+           inkscape:connector-curvature="0"
+           id="rect8336"
+           d="M 4.662862,7.482094 H 57.97979 c 2.91417,0 5.26021,2.346053 5.26021,5.260205 V 66.05923 c 0,2.91415 -2.34604,5.26021 -5.26021,5.26021 H 4.662862 c -2.914152,0 -5.260206,-2.34606 -5.260206,-5.26021 V 12.742299 c 0,-2.914152 2.346054,-5.260205 5.260206,-5.260205 z"
+           style="opacity:1;fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:1.70896196;stroke-linecap:butt;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+        <path
+           sodipodi:nodetypes="ssccscsccssccsc"
+           style="font-style:normal;font-weight:normal;font-size:92.12721252px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:37.00053024;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+           d="m 30.945098,17.562878 c -12.271676,0 -22.151217,2.839131 -22.151217,6.365941 v 19.577141 0.21003 11.78269 c 0,2.02923 3.272137,3.81567 8.38717,4.97982 3.563981,0.70336 9.09448,1.38612 13.762807,1.38612 3.670212,0 6.384321,-0.25757 9.425734,-0.70801 C 44.996619,55.7879 49.75871,49.89041 53.09627,43.57078 V 23.928819 c 0,-3.52681 -9.879507,-6.365941 -22.151172,-6.365941 z M 53.09627,47.59142 c -2.64492,4.58676 -6.222005,8.93409 -9.560192,13.00487 4.892172,-1.19131 9.560192,-3.14953 9.560192,-5.09761 z"
+           id="path4231"
+           inkscape:connector-curvature="0" />
+      </g>
+    </g>
+  </g>
+</svg>

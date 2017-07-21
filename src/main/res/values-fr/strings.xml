@@ -303,8 +303,8 @@
     <string name="activity_chooser_title">Envoyer le lien vers &#8230;</string>
     <string name="wait_for_tmp_copy_from_private_storage">Copie du fichier depuis le stockage privé</string>
     
-    <string name="oauth_check_onoff">Connexion avec OAuth 2.0</string> 
-    <string name="oauth_login_connection">Connexion au serveur OAuth 2.0…</string>    
+    <string name="oauth_check_onoff">Connexion avec oAuth2</string> 
+    <string name="oauth_login_connection">Connexion au serveur oAuth2…</string>    
         
     <string name="ssl_validator_header">L\'identité du site ne peut être vérifiée</string>
     <string name="ssl_validator_reason_cert_not_trusted">- Le certificat du serveur n\'est pas sûr</string>
@@ -347,7 +347,6 @@
     <string name="instant_video_upload_on_charging">Téléverser les images uniquement si le chargeur est branché</string>
     <string name="instant_upload_on_charging">Téléverser les images uniquement si le chargeur est branché</string>
     <string name="instant_upload_path">/InstantUpload</string>
-    <string name="auto_upload_path">/TéléversementAutomatique</string>
     <string name="conflict_title">Conflit de fichiers</string>
     <string name="conflict_message">Quels fichiers voulez-vous conserver ? Si vous sélectionnez les deux, un chiffre sera ajouté au nom du fichier local.</string>
     <string name="conflict_keep_both">Conserver les deux</string>
@@ -411,6 +410,13 @@
     <string name="file_migration_cleaning">Nettoyage&#8230;</string>
     <string name="file_migration_restoring_accounts_configuration">Restauration de la configuration des comptes&#8230;</string>
     <string name="file_migration_ok_finished">Terminé</string>
+    <string name="file_migration_failed_not_enough_space">ERREUR : Espace insuffisant</string>
+    <string name="file_migration_failed_not_writable">ERREUR : Le fichier n\'est pas modifiable</string>
+    <string name="file_migration_failed_not_readable">ERREUR : Le fichier n\'est pas lisible</string>
+    <string name="file_migration_failed_dir_already_exists">ERREUR : Le dossier Nextcloud existe déjà</string>
+    <string name="file_migration_failed_while_coping">ERREUR : Echec lors de la migration</string>
+    <string name="file_migration_failed_while_updating_index">ERREUR : Echec lors de la mise à jour de l\'index</string>
+
     <string name="file_migration_directory_already_exists">Le dossier de données existe déjà. Choisissez une des options suivantes :</string>
     <string name="file_migration_override_data_folder">Remplacer</string>
     <string name="file_migration_use_data_folder">Conserver le dossier actuel</string>
@@ -549,16 +555,17 @@
     <string name="drawer_participate">Participer</string>
     <string name="participate_testing_headline">Aidez nous en le testant</string>
     <string name="participate_testing_bug_text">Vous avez trouvé un bug ? Quelque chose vous semble étrange ?</string>
+    <string name="participate_testing_report_text">Signaler un problème sur Github</string>
     <string name="participate_testing_version_text">Vous avez envie de nous aider en testant les futures versions ?</string>
     <string name="participate_beta_headline">Testez la version Bêta</string>
     <string name="participate_beta_text">La version Beta inclut les dernières fonctionnalités qui sont encore toutes fraîches. Des erreurs peuvent se produire et si c\'est le cas, merci de nous les signaler.</string>
     <string name="participate_release_candidate_headline">Testez la version Release Candidate</string>
     <string name="participate_release_candidate_text">La version « release candidate » (RC) est un instantanné de la prochaine version et est supposée stable. Le test de votre configuration pourrait nous aider à nous assurer que cette version est entièrement stable. Inscrivez vous pour être testeur sur le Play store ou allez jeter un œil dans la section \"versions\" de F-Droid.</string>
     <string name="participate_contribute_headline">Participez activement</string>
-    <string name="participate_contribute_irc_text">Rejoingnez la discussion sur le canal IRC : &lt;font color=\"%1$s\">&lt;a href=\"%2$s\">#nextcloud-mobile&lt;/a>&lt;/font></string>
-    <string name="participate_contribute_forum_text">Aidez les autres utilisateurs sur le &lt;font color=\"%1$s\">&lt;a href=\"%2$s\">forum&lt;/a>&lt;/font></string>
-    <string name="participate_contribute_translate_text">&lt;font color=\"%1$s\">&lt;a href=\"%2$s\">Traduisez&lt;/a>&lt;/font> l\'application</string>
-    <string name="participate_contribute_github_text">Pour contrôler, réviser ou écrire du code, consultez &lt;font color=\"%1$s\">&lt;a href=\"%2$s\">CONTRIBUTING.md&lt;a>&lt;/font> pour plus d\'informations</string>
+    <string name="participate_contribute_irc_text">Rejoingnez la discussion sur le canal IRC : &lt;a href=\"%1$s\">#nextcloud-mobile&lt;/a>.</string>
+    <string name="participate_contribute_forum_text">Aidez les autres utilisateurs sur &lt;a href=\"%1$s\">le forum&lt;/a>.</string>
+    <string name="participate_contribute_translate_text">&lt;a href=\"%1$s\">Traduisez&lt;/a> l\'application.</string>
+    <string name="participate_contribute_github_text">Pour contrôler, réviser ou écrire du code, consultez &lt;a href=\"%1$s\">CONTRIBUTING.md&lt;a>.</string>
     <string name="move_to">Déplacer vers&#8230;</string>
     <string name="copy_to">Copier vers&#8230;</string>
     <string name="choose_remote_folder">Sélectionner le dossier&#8230;</string>
@@ -628,7 +635,10 @@
     <string name="actionbar_contacts">Copie de sauvegarde des contacts</string>
     <string name="actionbar_contacts_restore">Restaurer les contacts</string>
     <string name="contacts_backup_button">Sauvegarder maintenant</string>
-    <string name="contacts_automatic_backup">Copie de sauvegarde automatique</string>
+    <string name="contacts_restore_button">Restaurer la dernière copie de sauvegarde</string>
+    <string name="contacts_header_restore">Restaurer</string>
+    <string name="contacts_header_backup">Copie de sauvegarde</string>
+    <string name="contacts_automatic_backup">Sauvegarde des contacts</string>
     <string name="contacts_last_backup">Dernière copie de sauvegarde</string>
     <string name="contacts_read_permission">L\'autorisation de lecture des contacts est nécessaire</string>
     <string name="contacts_write_permission">L\'autorisation d\'écriture des contacts est nécessaire</string>
@@ -648,9 +658,4 @@
     <string name="drawer_logout">Se déconnecter</string>
     <string name="picture_set_as_no_app">Aucune application trouvée pour utiliser cette image !</string>
     <string name="privacy">Vie privée</string>
-    <string name="file_not_found">Fichier non trouvé !</string>
-
-    <string name="folder_sync_folders">Configurer les dossiers</string>
-
-  <string name="test_server_button">Tester la connexion du serveur</string>
 </resources>

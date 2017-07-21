@@ -50,7 +50,6 @@ import com.owncloud.android.lib.common.utils.Log_OC;
 import com.owncloud.android.ui.activity.FileActivity;
 import com.owncloud.android.utils.DisplayUtils;
 import com.owncloud.android.utils.MimeTypeUtil;
-import com.owncloud.android.utils.ThemeUtils;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -78,7 +77,7 @@ public class ExpandableUploadListAdapter extends BaseExpandableListAdapter imple
     private UploadGroup[] mUploadGroups = null;
 
     interface Refresh {
-        void refresh();
+        public void refresh();
     }
 
     abstract class UploadGroup implements Refresh {
@@ -714,7 +713,6 @@ public class ExpandableUploadListAdapter extends BaseExpandableListAdapter imple
         TextView tv = (TextView) convertView.findViewById(R.id.uploadListGroupName);
         tv.setText(String.format(mParentActivity.getString(R.string.uploads_view_group_header),
                 group.getGroupName(), group.getGroupItemCount()));
-        tv.setTextColor(ThemeUtils.primaryAccentColor());
         return convertView;
     }
 

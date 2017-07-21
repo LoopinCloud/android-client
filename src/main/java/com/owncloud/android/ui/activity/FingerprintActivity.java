@@ -1,4 +1,4 @@
-/*
+/**
  *   Nextcloud Android client application
  *
  *   @author Florian Lentz
@@ -28,7 +28,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
@@ -41,7 +40,6 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -51,7 +49,6 @@ import com.owncloud.android.MainApp;
 import com.owncloud.android.R;
 import com.owncloud.android.lib.common.utils.Log_OC;
 import com.owncloud.android.utils.AnalyticsUtils;
-import com.owncloud.android.utils.ThemeUtils;
 
 import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
@@ -71,7 +68,6 @@ import javax.crypto.SecretKey;
 /**
  * Activity to handle access to the app based on the fingerprint.
  */
-@TargetApi(Build.VERSION_CODES.M)
 public class FingerprintActivity extends AppCompatActivity {
 
     private static final String TAG = FingerprintActivity.class.getSimpleName();
@@ -84,8 +80,12 @@ public class FingerprintActivity extends AppCompatActivity {
 
     private KeyStore keyStore;
     // Variable used for storing the key in the Android Keystore container
-    private static final String KEY_NAME = "Nextcloud";
+    private static final String KEY_NAME = "Loopin";
     private Cipher cipher;
+
+    private FingerprintHandler helper;
+
+    private FingerprintManager.CryptoObject cryptoObject;
 
     private CancellationSignal cancellationSignal;
 
@@ -97,14 +97,6 @@ public class FingerprintActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fingerprintlock);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(ThemeUtils.primaryDarkColor());
-        }
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitleTextColor(ThemeUtils.fontColor());
-        toolbar.setBackground(new ColorDrawable(ThemeUtils.primaryColor()));
     }
 
     private void startFingerprint() {
@@ -119,11 +111,13 @@ public class FingerprintActivity extends AppCompatActivity {
         }
         KeyguardManager keyguardManager = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
 
-        if (keyguardManager.isKeyguardSecure()) {
+        if (!keyguardManager.isKeyguardSecure()) {
+            return;
+        } else {
             generateKey();
 
             if (cipherInit()) {
-                FingerprintManager.CryptoObject cryptoObject = new FingerprintManager.CryptoObject(cipher);
+                cryptoObject = new FingerprintManager.CryptoObject(cipher);
                 FingerprintHandler.Callback callback = new FingerprintHandler.Callback() {
                     @Override
                     public void onAuthenticated() {
@@ -146,7 +140,7 @@ public class FingerprintActivity extends AppCompatActivity {
                     }
                 };
 
-                FingerprintHandler helper = new FingerprintHandler(fingerprintTextView, callback);
+                helper = new FingerprintHandler(fingerprintTextView, callback);
                 cancellationSignal = new CancellationSignal();
                 if (ActivityCompat.checkSelfPermission(MainApp.getAppContext(), Manifest.permission.USE_FINGERPRINT)
                         != PackageManager.PERMISSION_GRANTED) {
@@ -163,7 +157,7 @@ public class FingerprintActivity extends AppCompatActivity {
         AnalyticsUtils.setCurrentScreenName(this, SCREEN_NAME, TAG);
         startFingerprint();
         ImageView imageView = (ImageView)findViewById(R.id.fingerprinticon);
-        imageView.setImageDrawable(ThemeUtils.tintDrawable(R.drawable.ic_fingerprint, ThemeUtils.primaryColor()));
+        imageView.setImageDrawable(getDrawable(R.drawable.ic_fingerprint));
     }
 
     @Override
@@ -180,10 +174,14 @@ public class FingerprintActivity extends AppCompatActivity {
      * @return 'True' when the key event was processed by this method.
      */
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        return keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0 || super.onKeyDown(keyCode, event);
+    public boolean onKeyDown(int keyCode, KeyEvent event){
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount()== 0){
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
+    @TargetApi(Build.VERSION_CODES.M)
     protected void generateKey() {
         try {
             keyStore = KeyStore.getInstance(ANDROID_KEY_STORE);
@@ -194,7 +192,11 @@ public class FingerprintActivity extends AppCompatActivity {
         KeyGenerator keyGenerator;
         try {
             keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE);
+        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
+            return;
+        }
 
+        try {
             keyStore.load(null);
             keyGenerator.init(
                     new KeyGenParameterSpec.Builder(
@@ -205,12 +207,12 @@ public class FingerprintActivity extends AppCompatActivity {
                             .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
                             .build());
             keyGenerator.generateKey();
-        } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException | CertificateException | IOException |
-                NoSuchProviderException e) {
-            Log_OC.e(TAG, "Exception: " + e.getMessage());
+        } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException | CertificateException | IOException e) {
+            return;
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.M)
     public boolean cipherInit() {
         try {
             cipher = Cipher.getInstance(
@@ -238,8 +240,8 @@ public class FingerprintActivity extends AppCompatActivity {
         }
     }
 
-    private void fingerprintResult(boolean fingerOk) {
-        if (fingerOk) {
+    private void fingerprintResult(boolean fingerok) {
+        if (fingerok) {
             Intent resultIntent = new Intent();
             resultIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             resultIntent.putExtra(KEY_CHECK_RESULT, true);
@@ -302,9 +304,9 @@ class FingerprintHandler extends FingerprintManager.AuthenticationCallback {
     private Callback callback;
 
     // Constructor
-    FingerprintHandler(TextView mText, Callback mCallback) {
-        text = mText;
-        callback = mCallback;
+    FingerprintHandler(TextView mtext, Callback mcallback) {
+        text = mtext;
+        callback = mcallback;
     }
 
     @Override

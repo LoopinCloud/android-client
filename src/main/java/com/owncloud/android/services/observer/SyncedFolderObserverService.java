@@ -28,7 +28,6 @@ import android.os.Binder;
 import android.os.IBinder;
 
 import com.owncloud.android.MainApp;
-import com.owncloud.android.R;
 import com.owncloud.android.datamodel.SyncedFolder;
 import com.owncloud.android.datamodel.SyncedFolderProvider;
 import com.owncloud.android.lib.common.utils.Log_OC;
@@ -70,8 +69,7 @@ public class SyncedFolderObserverService extends Service {
 
                 try {
                     observer.init();
-                    observer.addListener(new AdvancedFileAlterationListener(syncedFolder,
-                            getResources().getBoolean(R.bool.syncedFolder_light)));
+                    observer.addListener(new AdvancedFileAlterationListener(syncedFolder));
                     monitor.addObserver(observer);
                 } catch (Exception e) {
                     Log_OC.d(TAG, "Failed getting an observer to initialize " + e);
@@ -137,8 +135,7 @@ public class SyncedFolderObserverService extends Service {
                     try {
                         advancedFileAlterationObserver = new AdvancedFileAlterationObserver(syncedFolder, fileFilter);
                         advancedFileAlterationObserver.init();
-                        advancedFileAlterationObserver.addListener(new AdvancedFileAlterationListener(syncedFolder,
-                                getResources().getBoolean(R.bool.syncedFolder_light)));
+                        advancedFileAlterationObserver.addListener(new AdvancedFileAlterationListener(syncedFolder));
                         monitor.addObserver(advancedFileAlterationObserver);
                     } catch (Exception e) {
                         Log_OC.d(TAG, "Failed getting an observer to initialize");
@@ -155,8 +152,7 @@ public class SyncedFolderObserverService extends Service {
             try {
                 advancedFileAlterationObserver = new AdvancedFileAlterationObserver(syncedFolder, fileFilter);
                 advancedFileAlterationObserver.init();
-                advancedFileAlterationObserver.addListener(new AdvancedFileAlterationListener(syncedFolder,
-                        getResources().getBoolean(R.bool.syncedFolder_light)));
+                advancedFileAlterationObserver.addListener(new AdvancedFileAlterationListener(syncedFolder));
                 monitor.addObserver(advancedFileAlterationObserver);
             } catch (Exception e) {
                 Log_OC.d(TAG, "Failed getting an observer to initialize");

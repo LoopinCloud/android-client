@@ -39,7 +39,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
 import com.owncloud.android.R;
-import com.owncloud.android.utils.ThemeUtils;
+import com.owncloud.android.utils.DisplayUtils;
 
 import java.util.Formatter;
 import java.util.Locale;
@@ -197,10 +197,6 @@ public class MediaControlView extends FrameLayout /* implements OnLayoutChangeLi
         updatePausePlay();
     }
 
-    public void stopMediaPlayerMessages() {
-        mHandler.removeMessages(SHOW_PROGRESS);
-    }
-
 
     private void initControllerView(View v) {
         mPauseButton = (ImageButton) v.findViewById(R.id.playBtn);
@@ -223,10 +219,10 @@ public class MediaControlView extends FrameLayout /* implements OnLayoutChangeLi
         if (mProgress != null) {
             if (mProgress instanceof SeekBar) {
                 SeekBar seeker = (SeekBar) mProgress;
-                ThemeUtils.colorPreLollipopHorizontalSeekBar(seeker);
+                DisplayUtils.colorPreLollipopHorizontalSeekBar(seeker);
                 seeker.setOnSeekBarChangeListener(this);
             } else {
-                ThemeUtils.colorPreLollipopHorizontalProgressBar(mProgress);
+                DisplayUtils.colorPreLollipopHorizontalProgressBar(mProgress);
             }
             mProgress.setMax(1000);
         }

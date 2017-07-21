@@ -97,9 +97,6 @@
     <string name="file_list_seconds_ago">před pár sekundami</string>
     <string name="file_list_empty_headline">Nejsou zde žádné soubory</string>
     <string name="file_list_empty">Nahrajte nějaký obsah, nebo synchronizujte s vašimi zařízeními!</string>
-    <string name="file_list_empty_favorites">Označte nějaké soubory jako oblíbené nebo synchronizujte se svými přístroji.</string>
-    <string name="file_list_empty_favorites_filter_list">Zde budou zobrazeny soubory a adresáře označené jako oblíbené</string>
-    <string name="file_list_empty_favorites_filter">Vaše vyhledávání nenalezlo žádné oblíbené soubory</string>
     <string name="file_list_loading">Načítání&#8230;</string>
     <string name="file_list_no_app_for_file_type">Pro tento typ souboru nebyla nalezena aplikace!</string>
     <string name="local_file_list_empty">V tomto adresáři nejsou žádné soubory.</string>
@@ -107,18 +104,9 @@
     <string name="file_list_empty_headline_server_search">Žádné výsledky</string>
     <string name="file_list_empty_favorite_headline">Zatím není nic oblíbeno</string>
     <string name="file_list_empty_shared_headline">Není nic sdílené</string>
-    <string name="file_list_empty_shared">Zde budou zobrazeny vámi sdílené soubory a adresáře</string>
     <string name="file_list_empty_headline_server_search_videos">Žádné video</string>
     <string name="file_list_empty_headline_server_search_photos">Žádná fotka</string>
     <string name="file_list_empty_search">Zkusit hledat v jiné složce?</string>
-    <string name="file_list_empty_recently_modified">Nenalezeny žádné soubory upravené v posledních 7 dnech</string>
-    <string name="file_list_empty_recently_modified_filter">Vyhledávání nenalezlo žádné změny v posledních 7 dnech.</string>
-    <string name="file_list_empty_recently_added">Nenalezeny žádné nedávno přidané soubory</string>
-    <string name="file_list_empty_recently_added_filter">Vaše vyhledávání nenalezlo žádné nedávno přidané soubory.</string>
-    <string name="file_list_empty_text_photos">Nahrajte nějaké fotky nebo aktivujte automatické nahrávání.</string>
-    <string name="file_list_empty_text_photos_filter">Vaše vyhledávání nenalezlo žádné fotky.</string>
-    <string name="file_list_empty_text_videos">Nahrajte nějaká videa nebo aktivujte automatické nahrávání.</string>
-    <string name="file_list_empty_text_videos_filter">Vaše vyhledávání nenalezlo žádná videa.</string>
     <string name="upload_list_empty_headline">Nic k nahrání</string>
     <string name="upload_list_empty_text">Nahrajte nějaký obsah, nebo aktivujte okamžité nahrání!</string>
     <string name="upload_list_empty_text_auto_upload">Nahrajte nějaký obsah nebo aktivujte automatické nahrávání.</string>
@@ -303,8 +291,8 @@
     <string name="activity_chooser_title">Odeslat odkaz &#8230;</string>
     <string name="wait_for_tmp_copy_from_private_storage">Kopírování souboru z privátního úložiště</string>
     
-    <string name="oauth_check_onoff">Přihlásit se s OAuth 2.0</string> 
-    <string name="oauth_login_connection">Připojuji se k OAuth 2.0 serveru...</string>    
+    <string name="oauth_check_onoff">Přihlásit se s oAuth2</string> 
+    <string name="oauth_login_connection">Připojuji se k oAuth2 serveru...</string>    
         
     <string name="ssl_validator_header">Identitu stránky nelze ověřit</string>
     <string name="ssl_validator_reason_cert_not_trusted">- Certifikát serveru je nedůvěryhodný</string>
@@ -347,7 +335,6 @@
     <string name="instant_video_upload_on_charging">Nahrávat pouze při nabíjení</string>
     <string name="instant_upload_on_charging">Nahrávat pouze při nabíjení</string>
     <string name="instant_upload_path">/InstantUpload</string>
-    <string name="auto_upload_path">/AutomatickéNahrávání</string>
     <string name="conflict_title">Konflikt souboru</string>
     <string name="conflict_message">Které soubory chcete ponechat? Pokud zvolíte obě verze, zkopírovaný soubor bude mít název doplněný o číslo.</string>
     <string name="conflict_keep_both">Ponechat oba</string>
@@ -411,12 +398,14 @@
     <string name="file_migration_cleaning">Čištění&#8230;</string>
     <string name="file_migration_restoring_accounts_configuration">Obnovování konfigurace účtů&#8230;</string>
     <string name="file_migration_ok_finished">Dokončeno</string>
-    <string name="file_migration_directory_already_exists">Datový adresář již existuje. Vyberte jednu z následujících možností:</string>
+    <string name="file_migration_failed_not_enough_space">CHYBA: Nedostatečné místo</string>
+    <string name="file_migration_failed_dir_already_exists">CHYBA: Nextcloud adresář již existuje</string>
+    <string name="file_migration_failed_while_coping">CHYBA: V průběhu migrace</string>
+    <string name="file_migration_failed_while_updating_index">CHYBA: V průběhu aktualizace indexu</string>
+
+    <string name="file_migration_directory_already_exists">Datový adresář již existuje, co teď?</string>
     <string name="file_migration_override_data_folder">Nahradit</string>
     <string name="file_migration_use_data_folder">Použít</string>
-
-    <string name="file_migration_source_not_readable_title">Ze zdrojového adresáře nelze číst!</string>
-    <string name="file_migration_source_not_readable">Opravdu chcete změnit adresář úložiště na %1$s?\n\nPoznámka: Všechna data budou stažena znovu.</string>
 
     <string name="prefs_category_accounts">Účty</string>
     <string name="prefs_add_account">Přidat účet</string>
@@ -475,9 +464,6 @@
     <string name="file_list__footer__files">%1$d soubory(ů)</string>
     <string name="file_list__footer__files_and_folder">%1$d soubory(ů), 1 adresář</string>
     <string name="file_list__footer__files_and_folders">%1$d soubory(ů), %2$d adresáře(ů)</string>
-    <string name="set_picture_as">Použít obrázek jako</string>
-    <string name="set_as">Nastavit jako</string>
-
     <string name="prefs_instant_behaviour_dialogTitle">Originální soubor bude&#8230;</string>
     <string name="prefs_instant_behaviour_title">Originální soubor bude&#8230;</string>
     <string name="upload_copy_files">Zkopírovat soubor</string>
@@ -539,8 +525,6 @@
     <string name="local_file_not_found_toast">Soubor nebyl nalezen v místním souborovém systému</string>
     <string name="confirmation_remove_files_alert">Opravdu chcete odstranit vybrané položky?</string>
     <string name="confirmation_remove_folders_alert">Opravdu chcete odstranit vybrané položky a jejich obsah?</string>
-    <string name="maintenance_mode">Server je v režimu údržby</string>
-
     <string name="uploads_view_upload_status_waiting_for_charging">Čekání na nabití</string>
     <string name="actionbar_search">Hledat</string>
     <string name="files_drop_not_supported">Toto je Nextcloud funkce, prosím nahrát</string>
@@ -549,16 +533,13 @@
     <string name="drawer_participate">Zúčastnit se</string>
     <string name="participate_testing_headline">Pomoz nám testovat</string>
     <string name="participate_testing_bug_text">Našli jste chybu? Něco podivného?</string>
+    <string name="participate_testing_report_text">Nahlásit chybu na Github</string>
     <string name="participate_testing_version_text">Chceš nám pomoci testovat další verzi?</string>
     <string name="participate_beta_headline">Testovat noční verzi</string>
     <string name="participate_beta_text">Zahrnuje všechny nadcházející funkce a pohybuje se na hraně stability. Mohou se vyskytnout chyby, a pokud ano, nahlašte nám je prosím.</string>
     <string name="participate_release_candidate_headline">Předběžná verze</string>
-    <string name="participate_release_candidate_text">Kandidát na vydání (RC) je snímkem nadcházejícího vydání a očekává se, že bude stabilní. Testování vašeho individuálního nastavení by to mohlo pomoci zajistit. Přihlaste se k testování v Obchodě Play nebo se podívejte do F-Droid v části \"Verze\" a přihlaste se manuálně.</string>
+    <string name="participate_release_candidate_text">Předběžná verze nebo také Release Candidate (RC) je stabilní stav připravované, finální verze. Přihlas se jako tester v Play store nebo si najdi a instaluj hodící se verzi z F-Droid pod \"Verze\".</string>
     <string name="participate_contribute_headline">Aktivně něčím přispět</string>
-    <string name="participate_contribute_irc_text">Diskutovat na IRC: &lt;font color=\"%1$s\">&lt;a href=\"%2$s\">#nextcloud-mobile&lt;/a>&lt;/font></string>
-    <string name="participate_contribute_forum_text">Pomozte ostatním na &lt;font color=\"%1$s\">&lt;a href=\"%2$s\">fóru&lt;/a>&lt;/font></string>
-    <string name="participate_contribute_translate_text">&lt;font color=\"%1$s\">&lt;a href=\"%2$s\">Přeložte&lt;/a>&lt;/font> aplikaci</string>
-    <string name="participate_contribute_github_text">Přispět jako vývojář, detaily pod &lt;font color=\"%1$s\">&lt;a href=\"%2$s\">CONTRIBUTING.md&lt;/a>&lt;/font></string>
     <string name="move_to">Přesunout do&#8230;</string>
     <string name="copy_to">Kopírovat do&#8230;</string>
     <string name="choose_remote_folder">Vybrat adresář&#8230;</string>
@@ -577,7 +558,6 @@
     <string name="activity_list_loading_activity">Načítání aktivit&#8230;</string>
     <string name="activity_list_no_results">Žádné aktivity nebyly nalezeny.</string>
 
-    <string name="notifications_loading_activity">Načítání upozornění&#8230;</string>
     <string name="notifications_no_results_headline">Žádné oznámení</string>
     <string name="notifications_no_results_message">Prosíme, vraťte se později.</string>
 
@@ -626,10 +606,13 @@
     <string name="webview_error">Došlo k chybě</string>
     <string name="prefs_category_about">O aplikaci</string>
 
-    <string name="actionbar_contacts">Zálohování kontaktů</string>
+    <string name="actionbar_contacts">Záložní kontakty</string>
     <string name="actionbar_contacts_restore">Obnovení kontaktů</string>
-    <string name="contacts_backup_button">Zálohovat nyní</string>
-    <string name="contacts_automatic_backup">Automatické zálohování</string>
+    <string name="contacts_backup_button">Zálohujte nyní</string>
+    <string name="contacts_restore_button">Obnovit poslední zálohu</string>
+    <string name="contacts_header_restore">Obnovit</string>
+    <string name="contacts_header_backup">Záloha</string>
+    <string name="contacts_automatic_backup">Zálohování kontaktů</string>
     <string name="contacts_last_backup">Poslední záloha</string>
     <string name="contacts_read_permission">Je třeba oprávnění ke čtení seznamu kontaktů</string>
     <string name="contacts_write_permission">Povolení změn v seznam kontaktů je vyžadováno</string>
@@ -647,11 +630,4 @@
     <!-- Notifications -->
     <string name="new_notification_received">Přijato nové upozornění</string>
     <string name="drawer_logout">Odhlásit se</string>
-    <string name="picture_set_as_no_app">Pro tento typ souboru nebyla nalezena aplikace!</string>
-    <string name="privacy">Soukromí</string>
-    <string name="file_not_found">Soubor nenalezen!</string>
-
-    <string name="folder_sync_folders">Nastavení adresářů</string>
-
-  <string name="test_server_button">Otestovat připojení k serveru</string>
-</resources>
+    </resources>
