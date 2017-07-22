@@ -26,4 +26,4 @@ Install any other package you consider interesting, such as emulators.
 
 For other software dependencies check the details in the section corresponding to your preferred IDE or build system.
 
-## For more info, please read [SETUP.md](https://github.com/LoopinCloud/android-client/blob/master/SETUP.md)
+#### For more info, please read [SETUP.md](https://github.com/LoopinCloud/android-client/blob/master/SETUP.md)
