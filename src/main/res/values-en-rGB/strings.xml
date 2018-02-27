@@ -81,7 +81,7 @@
     <string name="uploader_error_message_source_file_not_found">File selected for upload not found. Please check whether the file exists.</string>
     <string name="uploader_error_message_source_file_not_copied">Could not copy file to a temporary folder. Try to resend it.</string>
     <string name="uploader_upload_files_behaviour">Upload option:</string>
-    <string name="uploader_upload_files_behaviour_move_to_nextcloud_folder">Move file to Nextcloud folder</string>
+    <string name="uploader_upload_files_behaviour_move_to_nextcloud_folder">Move file to Techsize folder</string>
     <string name="uploader_upload_files_behaviour_only_upload">Keep file in source folder</string>
     <string name="uploader_upload_files_behaviour_upload_and_delete_from_source">Delete file from source folder</string>
     <string name="file_list_seconds_ago">seconds ago</string>
@@ -393,7 +393,7 @@
     <string name="file_migration_failed_not_enough_space">Error: Insufficient space</string>
     <string name="file_migration_failed_not_writable">Error: Destination file not writable</string>
     <string name="file_migration_failed_not_readable">Error: Source file not readable</string>
-    <string name="file_migration_failed_dir_already_exists">Error: Nextcloud directory already exists</string>
+    <string name="file_migration_failed_dir_already_exists">Error: Techsize directory already exists</string>
     <string name="file_migration_failed_while_coping">Error: Failed during migration</string>
     <string name="file_migration_failed_while_updating_index">Error: Failed to updating index</string>
 
@@ -532,7 +532,7 @@
 
     <string name="uploads_view_upload_status_waiting_for_charging">Awaiting charge</string>
     <string name="actionbar_search">Search</string>
-    <string name="files_drop_not_supported">This is a Nextcloud feature, please update.</string>
+    <string name="files_drop_not_supported">This is a Techsize feature, please update.</string>
     <string name="learn_more">Learn more</string>
     <string name="drawer_synced_folders">Auto upload</string>
     <string name="drawer_participate">Participate</string>

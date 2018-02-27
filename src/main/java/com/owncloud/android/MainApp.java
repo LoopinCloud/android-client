@@ -75,7 +75,7 @@ public class MainApp extends MultiDexApplication {
 
     private static final String TAG = MainApp.class.getSimpleName();
 
-    private static final String AUTH_ON = "on";
+    private static final String AUTH_ON = "off";
 
     @SuppressWarnings("unused")
     private static final String POLICY_SINGLE_SESSION_PER_ACCOUNT = "single session per account";
